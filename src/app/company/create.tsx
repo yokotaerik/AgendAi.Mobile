@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -37,12 +38,18 @@ export default function CreateCompany() {
   const [password, setPassword] = useState("");
 
   const handleSubmit = async () => {
-    if(isPasswordValid(password) === false) {
+    if (isPasswordValid(password) === false) {
       alert(t("invalidPassword"));
       return;
     }
 
-    if(email.indexOf("@") === -1) {
+    const invalidCharacters = /[!#$%&'*+/=?^`{|}~]/;
+    if (invalidCharacters.test(email)) {
+      Alert.alert(t("invalidEmail"));
+      return;
+    }
+
+    if (email.indexOf("@") === -1) {
       alert(t("invalidEmail"));
       return;
     }
@@ -65,9 +72,6 @@ export default function CreateCompany() {
       alert(t("emptyFields"));
       return;
     }
-
-
-
 
     try {
       const address: AddressDto = {

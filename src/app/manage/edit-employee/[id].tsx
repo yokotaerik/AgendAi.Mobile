@@ -99,12 +99,14 @@ const EditEmployee: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>{t("editEmployee.title")}</Text>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDeleteEmployee()}
-      >
-        <Feather name="trash-2" size={24} color="white" />
-      </TouchableOpacity>
+      {employeeEditData?.owner == false && (
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDeleteEmployee()}
+        >
+          <Feather name="trash-2" size={24} color="white" />
+        </TouchableOpacity>
+      )}
 
       <View style={styles.form}>
         <TextInput
@@ -125,7 +127,7 @@ const EditEmployee: React.FC = () => {
           }
         />
 
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder={t("editEmployee.emailPlaceholder")}
           value={employeeEditData?.email || ""}
@@ -134,7 +136,7 @@ const EditEmployee: React.FC = () => {
           }
           keyboardType="email-address"
           autoCapitalize="none"
-        />
+        /> */}
 
         <View style={styles.servicesContainer}>
           <Text style={styles.sectionTitle}>{t("editEmployee.service")}</Text>

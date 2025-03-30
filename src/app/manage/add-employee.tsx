@@ -28,7 +28,7 @@ export default function AddEmployee() {
     name: "",
     surname: "",
     email: "",
-    password: ""
+    password: "Senha@123"
   });
 
   const handleAddEmployee = async () => {
@@ -43,10 +43,10 @@ export default function AddEmployee() {
         return;
       }
 
-      if(isPasswordValid(employee.password) === false) {  
-        Alert.alert(t("invalidPassword"));
-        return;
-      }
+      // if(isPasswordValid(employee.password) === false) {  
+      //   Alert.alert(t("invalidPassword"));
+      //   return;
+      // }
 
       const response = await api.post("/employee", employee);
       if (response.status === 200) {
@@ -86,13 +86,13 @@ export default function AddEmployee() {
           autoCapitalize="none"
         />
 
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder={t("addEmployee.passwordPlaceholder")}
           value={employee.password}
           onChangeText={(text) => setEmployee({ ...employee, password: text })}
           secureTextEntry
-        />
+        /> */}
 
         <TouchableOpacity style={styles.button} onPress={handleAddEmployee}>
           <Text style={styles.buttonText}>{t("addEmployee.registerButton")}</Text>

@@ -29,6 +29,14 @@ export default function RegisterCustomer() {
       return;
     }
 
+    // Check if emails has invbalid caracthesr
+    // like ! # $ % & ' * + / = ? ^ ` { | } ~
+    const invalidCharacters = /[!#$%&'*+/=?^`{|}~]/;
+    if (invalidCharacters.test(email)) {
+      Alert.alert(t("invalidEmail"));
+      return;
+    }
+
     if (
       name.trim() === "" ||
       surname.trim() === "" ||
