@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   Alert,
@@ -11,6 +10,7 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
+import CustomInput from "../../components/ui/input/CustomInput";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ export default function Login() {
     try {
       await signIn({ email, password });
     } catch (error) {
-      Alert.alert(t("login.error"))
+      Alert.alert(t("login.error"));
     }
   };
 
@@ -36,20 +36,19 @@ export default function Login() {
       <View style={styles.content}>
         <Text style={styles.title}>{t("login.title")}</Text>
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("login.email")}
           value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
+          onChange={setEmail}
+          type="email"
           autoCapitalize="none"
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
+          type="password"
           placeholder={t("login.password")}
           value={password}
-          onChangeText={setPassword}
+          onChange={setPassword}
           secureTextEntry
         />
 
@@ -58,7 +57,9 @@ export default function Login() {
         </TouchableOpacity>
 
         <View style={styles.links}>
-          <TouchableOpacity onPress={() => router.push("/auth/register-customer")}>
+          <TouchableOpacity
+            onPress={() => router.push("/auth/register-customer")}
+          >
             <Text style={styles.link}>{t("login.createAccount")}</Text>
           </TouchableOpacity>
 

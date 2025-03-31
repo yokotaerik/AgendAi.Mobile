@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -9,10 +8,10 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-import { useAuth } from "../../contexts/AuthContext";
-import api from "../../api";
 import { useTranslation } from "react-i18next";
-import { isPasswordValid } from "../../utils/passwordHelper";
+import api from "../../../api";
+import { useAuth } from "../../../contexts/AuthContext";
+import CustomInput from "../../../components/ui/input/CustomInput";
 
 interface CreateEmployeeDto {
   name: string;
@@ -43,11 +42,6 @@ export default function AddEmployee() {
         return;
       }
 
-      // if(isPasswordValid(employee.password) === false) {  
-      //   Alert.alert(t("invalidPassword"));
-      //   return;
-      // }
-
       const response = await api.post("/employee", employee);
       if (response.status === 200) {
         router.back();
@@ -63,34 +57,30 @@ export default function AddEmployee() {
       <Text style={styles.title}>{t("addEmployee.title")}</Text>
 
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("addEmployee.namePlaceholder")}
           value={employee.name}
-          onChangeText={(text) => setEmployee({ ...employee, name: text })}
+          onChange={(text: string) => setEmployee({ ...employee, name: text })}
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("addEmployee.surnamePlaceholder")}
           value={employee.surname}
-          onChangeText={(text) => setEmployee({ ...employee, surname: text })}
+          onChange={(text: string) => setEmployee({ ...employee, surname: text })}
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("addEmployee.emailPlaceholder")}
           value={employee.email}
-          onChangeText={(text) => setEmployee({ ...employee, email: text })}
+          onChange={(text: string) => setEmployee({ ...employee, email: text })}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        {/* <TextInput
-          style={styles.input}
+        {/* <CustomInput
           placeholder={t("addEmployee.passwordPlaceholder")}
           value={employee.password}
-          onChangeText={(text) => setEmployee({ ...employee, password: text })}
+          onChange={(text: string) => setEmployee({ ...employee, password: text })}
           secureTextEntry
         /> */}
 

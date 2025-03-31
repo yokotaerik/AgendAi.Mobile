@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   Alert,
@@ -13,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { isPasswordValid } from "../../utils/passwordHelper";
+import CustomInput from "../../components/ui/input/CustomInput";
 
 export default function RegisterCustomer() {
   const { t } = useTranslation();
@@ -83,43 +83,40 @@ export default function RegisterCustomer() {
       <View style={styles.content}>
         <Text style={styles.title}>{t("register.title")}</Text>
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("register.name")}
           value={name}
-          onChangeText={setName}
+          onChange={setName}
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("register.surname")}
           value={surname}
-          onChangeText={setSurname}
+          onChange={setSurname}
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("register.email")}
           value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
+          onChange={setEmail}
+          type="email"
           autoCapitalize="none"
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("register.password")}
           value={password}
-          onChangeText={setPassword}
+          onChange={setPassword}
+          type="password"
           secureTextEntry
         />
 
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder={t("register.confirmPassword")}
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChange={setConfirmPassword}
           secureTextEntry
+          type="password"
         />
 
         <TouchableOpacity

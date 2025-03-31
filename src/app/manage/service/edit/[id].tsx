@@ -1,22 +1,22 @@
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
   ScrollView,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
-import api from "../../../api";
-import { useGetService } from "../../../hooks/service/serviceHooks";
-import useTimeSpan from "../../../hooks/utils/useTimeSpan";
-import { UpdateServiceDto } from "../../../types/service";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import api from "../../../../api";
+import { useGetService } from "../../../../hooks/service/serviceHooks";
+import useTimeSpan from "../../../../hooks/utils/useTimeSpan";
+import { UpdateServiceDto } from "../../../../types/service";
+import CustomInput from "../../../../components/ui/input/CustomInput";
 
 export default function EditService() {
   const { t } = useTranslation();
@@ -142,28 +142,26 @@ export default function EditService() {
       <Text style={styles.title}>{t("editService.title")}</Text>
 
       <View style={styles.form}>
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editService.namePlaceholder")}
-          value={formData.name}
-          onChangeText={(text) => setFormData({ ...formData, name: text })}
+          value={formData.name || ""}
+          onChange={(text) => setFormData({ ...formData, name: text })}
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editService.descriptionPlaceholder")}
-          value={formData.description}
-          onChangeText={(text) =>
-            setFormData({ ...formData, description: text })
-          }
+          value={formData.description || ""}
+          onChange={(text) => setFormData({ ...formData, description: text })}
           multiline
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editService.pricePlaceholder")}
           value={price}
-          onChangeText={(value) => {
+          onChange={(value) => {
             const parsedValue = parseFloat(value);
             if (!isNaN(parsedValue) || value === "") {
               setPrice(value);
@@ -173,11 +171,11 @@ export default function EditService() {
           keyboardType="numeric"
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editService.durationPlaceholder")}
           value={duration}
-          onChangeText={(value) => {
+          onChange={(value) => {
             if (!isNaN(parseInt(value)) || value === "")
               handleChangeDuration(value);
           }}

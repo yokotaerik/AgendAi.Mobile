@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
@@ -11,6 +10,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   SafeAreaView,
+  TextInput,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -24,6 +24,7 @@ import { UserType } from "../../../types/common";
 import api, { baseURL } from "../../../api";
 import * as signalR from "@microsoft/signalr";
 import { Feather } from "@expo/vector-icons";
+import CustomInput from "../../../components/ui/input/CustomInput";
 
 interface MessageDto {
   id: string;
@@ -163,12 +164,20 @@ export default function Chat() {
     >
       <SafeAreaView style={styles.header}>
         {messages.length > 0 && (
-          <View style={{ display: "flex", alignItems: "center", height:50, flexDirection: "row", gap: 5}}>
+          <View
+            style={{
+              display: "flex",
+              alignItems: "center",
+              height: 50,
+              flexDirection: "row",
+              gap: 5,
+            }}
+          >
             <Feather
               name="chevron-left"
               size={24}
               color="black"
-              style ={{marginTop: 5}}
+              style={{ marginTop: 5 }}
               onPress={() => router.back()}
             />
             <Text style={styles.chatHeader}>

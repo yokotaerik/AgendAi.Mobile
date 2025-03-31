@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -15,6 +14,7 @@ import { RegisterEmployeeDto } from "../../types/employee";
 import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { isPasswordValid } from "../../utils/passwordHelper";
+import CustomInput from "../../components/ui/input/CustomInput";
 
 export default function CreateCompany() {
   const { t } = useTranslation();
@@ -115,89 +115,52 @@ export default function CreateCompany() {
         <Text style={styles.title}>Cadastro de Empresa</Text>
 
         <Text style={styles.sectionTitle}>Dados da Empresa</Text>
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder="Razão Social"
           value={corporateName}
-          onChangeText={setCorporateName}
+          onChange={setCorporateName}
         />
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder="Nome Fantasia"
           value={fantasyName}
-          onChangeText={setFantasyName}
+          onChange={setFantasyName}
         />
 
         <Text style={styles.sectionTitle}>Endereço</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Rua"
-          value={street}
-          onChangeText={setStreet}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Número"
-          value={number}
-          onChangeText={setNumber}
-        />
-        <TextInput
-          style={styles.input}
+        <CustomInput placeholder="Rua" value={street} onChange={setStreet} />
+        <CustomInput placeholder="Número" value={number} onChange={setNumber} />
+        <CustomInput
           placeholder="Complemento"
           value={complement}
-          onChangeText={setComplement}
+          onChange={setComplement}
         />
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder="Bairro"
           value={neighborhood}
-          onChangeText={setNeighborhood}
+          onChange={setNeighborhood}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Cidade"
-          value={city}
-          onChangeText={setCity}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Estado"
-          value={state}
-          onChangeText={setState}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="CEP"
-          value={zipCode}
-          onChangeText={setZipCode}
-        />
+        <CustomInput placeholder="Cidade" value={city} onChange={setCity} />
+        <CustomInput placeholder="Estado" value={state} onChange={setState} />
+        <CustomInput placeholder="CEP" value={zipCode} onChange={setZipCode} />
 
         <Text style={styles.sectionTitle}>Dados do Proprietário</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
+        <CustomInput placeholder="Nome" value={name} onChange={setName} />
+        <CustomInput
           placeholder="Sobrenome"
           value={surname}
-          onChangeText={setSurname}
+          onChange={setSurname}
         />
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder="Email"
           value={email}
-          onChangeText={setEmail}
+          onChange={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <TextInput
-          style={styles.input}
+        <CustomInput
           placeholder="Senha"
           value={password}
-          onChangeText={setPassword}
+          onChange={setPassword}
           secureTextEntry
         />
 

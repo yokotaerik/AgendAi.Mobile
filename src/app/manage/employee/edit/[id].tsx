@@ -1,24 +1,22 @@
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useAuth } from "../../../contexts/AuthContext";
-import {
-  useEditEmployee,
-  useGetEmployee,
-} from "../../../hooks/employee/employeeHook";
-import { EmployeeDto } from "../../../types/employee";
-import { useListServices } from "../../../hooks/service/serviceHooks";
+
 import {
   SafeAreaView,
   View,
-  TextInput,
   TouchableOpacity,
   Text,
   StyleSheet,
   Alert,
 } from "react-native";
-import api from "../../../api";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import api from "../../../../api";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { useEditEmployee } from "../../../../hooks/employee/employeeHook";
+import { useListServices } from "../../../../hooks/service/serviceHooks";
+import { EmployeeDto } from "../../../../types/employee";
+import CustomInput from "../../../../components/ui/input/CustomInput";
 
 const EditEmployee: React.FC = () => {
   const { t } = useTranslation();
@@ -109,29 +107,27 @@ const EditEmployee: React.FC = () => {
       )}
 
       <View style={styles.form}>
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editEmployee.namePlaceholder")}
-          value={employeeEditData?.name}
-          onChangeText={(text) =>
-            setEmployee({ ...employeeEditData!, name: text })
-          }
+          value={employeeEditData?.name || ""}
+          onChange={(text) => setEmployee({ ...employeeEditData!, name: text })}
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("editEmployee.surnamePlaceholder")}
           value={employeeEditData?.surname || ""}
-          onChangeText={(text) =>
+          onChange={(text) =>
             setEmployee({ ...employeeEditData!, surname: text })
           }
         />
 
-        {/* <TextInput
+        {/* <CustomInput
           style={styles.input}
           placeholder={t("editEmployee.emailPlaceholder")}
           value={employeeEditData?.email || ""}
-          onChangeText={(text) =>
+          onChange={(text) =>
             setEmployee({ ...employeeEditData!, email: text })
           }
           keyboardType="email-address"

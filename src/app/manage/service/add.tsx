@@ -1,19 +1,19 @@
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import api from "../../../api";
 import { useTranslation } from "react-i18next";
 import useTimeSpan from "../../../hooks/utils/useTimeSpan";
 import { UpdateServiceDto } from "../../../types/service";
+import CustomInput from "../../../components/ui/input/CustomInput";
 
 export default function AddService() {
   const { t } = useTranslation();
@@ -67,26 +67,26 @@ export default function AddService() {
       <Text style={styles.title}>{t("addService.title")}</Text>
 
       <View style={styles.form}>
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("addService.namePlaceholder")}
-          value={service.name}
-          onChangeText={(text) => setService({ ...service, name: text })}
+          value={service.name || ""}
+          onChange={(text) => setService({ ...service, name: text })}
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("addService.descriptionPlaceholder")}
-          value={service.description}
-          onChangeText={(text) => setService({ ...service, description: text })}
+          value={service.description || ""}
+          onChange={(text) => setService({ ...service, description: text })}
           multiline
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("addService.pricePlaceholder")}
           value={price}
-          onChangeText={(value) => {
+          onChange={(value) => {
             const parsedValue = parseFloat(value);
             if (!isNaN(parsedValue) || value === "") {
               setPrice(value);
@@ -96,11 +96,11 @@ export default function AddService() {
           keyboardType="numeric"
         />
 
-        <TextInput
+        <CustomInput
           style={styles.input}
           placeholder={t("addService.durationPlaceholder")}
           value={duration}
-          onChangeText={(value) => {
+          onChange={(value) => {
             if (!isNaN(parseInt(value)) || value === "")
               handleChangeDuration(value);
           }}

@@ -14,37 +14,30 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useListServices } from "../../hooks/service/serviceHooks";
 import { useEffect, useState } from "react";
 import ServiceCard from "../../components/service/ServiceCard";
-import { useListEmployees } from "../../hooks/employee/employeeHook";
-import BasicInfoCard from "../../components/ui/BasicInfoCard";
 import { useGetCompany } from "../../hooks/company/companyHooks";
 import CompleteCompanyCard from "../../components/company/CompleteCompanyCard";
 
 export default function ManageCompany() {
   const { t } = useTranslation();
   const { companyId } = useAuth();
-  const { company, fetchCompany } = useGetCompany()
-  const { services,  error : serviceError, fetchServices } = useListServices();
-  const { employees, error : employeeError, fetchEmployees } = useListEmployees()
+  const { company, fetchCompany } = useGetCompany();
+  const { services, error: serviceError, fetchServices } = useListServices();
+
   const [refreshing, setRefreshing] = useState(false);
 
-  
-
   useEffect(() => {
-    if(companyId != null) {
-      fetchServices(companyId)
-      fetchEmployees(companyId)
-      fetchCompany(companyId)
+    if (companyId != null) {
+      fetchServices(companyId);
+      fetchCompany(companyId);
     }
-
-  }, [companyId])
+  }, [companyId]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    
+
     try {
       fetchServices(companyId!);
-      fetchEmployees(companyId!);
-      fetchCompany(companyId!)
+      fetchCompany(companyId!);
     } catch (error) {
       console.error("Erro ao atualizar:", error);
     } finally {
@@ -65,13 +58,6 @@ export default function ManageCompany() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("/manage/service/add-service")}
-            >
-              <Text style={styles.buttonText}>Adicionar Serviço</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.button}
               onPress={() => router.push("/manage/employee/add-employee")}
             >
               <Text style={styles.buttonText}>Adicionar Funcionário</Text>
@@ -82,7 +68,7 @@ export default function ManageCompany() {
             <Text style={styles.sectionTitle}>Serviços</Text>
             {services && services.length > 0 ? (
               <FlatList
-              scrollEnabled={true}
+                scrollEnabled={true}
                 horizontal={true}
                 data={services}
                 keyExtractor={(item) => item.id}
@@ -94,13 +80,11 @@ export default function ManageCompany() {
                       router.push(`/manage/service/edit-service/${item.id}`)
                     }
                   >
-                    <ServiceCard service={item}/>
+                    <ServiceCard service={item} />
                   </TouchableOpacity>
                 )}
                 ListEmptyComponent={() => (
-                  <Text style={styles.emptyText}>
-                    {t("noServicesFound")}
-                  </Text>
+                  <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
                 )}
               />
             ) : (
@@ -109,44 +93,14 @@ export default function ManageCompany() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t("employees")}</Text>
-            {employees && employees.length > 0 ? (
-              <FlatList
-              scrollEnabled={true}
-                horizontal={true}
-                data={employees}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.flatListContent}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() =>
-                      router.push(`/manage/employee/edit-employee/${item.id}`)
-                    }
-                  >
-                    <BasicInfoCard basicInfo={{ id: item.id, completeName: item.completeName , imageUrl: item.imageUrl}} />
-                  </TouchableOpacity>
-                )}
-                ListEmptyComponent={() => (
-                  <Text style={styles.emptyText}>
-                    {t("noEmployeeFound")}
-                  </Text>
-                )}
-              />
-            ) : (
-              <Text style={styles.emptyText}>{t("noEmployeeFound")}</Text>
-            )}
+            <TouchableOpacity onPress={() => router.push("/manage/employee")}>
+              <Text> {t("manageEmployee")}</Text>
+            </TouchableOpacity>
           </View>
-
 
           <View style={styles.section}>
-
-            {company != null ? (
-              <CompleteCompanyCard company={company} />
-            ) : null }
+            {company != null ? <CompleteCompanyCard company={company} /> : null}
           </View>
-
-
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -215,8 +169,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   flatListContent: {
-    gap: 10, 
+    gap: 10,
   },
 });
-
-

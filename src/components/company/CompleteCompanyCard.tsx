@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Image,
   Alert,
@@ -12,6 +11,7 @@ import { CompleteCompanyDto, UpdateCompanyDto } from "../../types/company";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useEditCompany } from "../../hooks/company/companyHooks";
+import CustomInput from "../ui/input/CustomInput";
 
 interface CompleteCompanyCardProps {
   company: CompleteCompanyDto;
@@ -76,67 +76,68 @@ const CompleteCompanyCard: React.FC<CompleteCompanyCardProps> = ({
       </View>
 
       <Text style={styles.label}>{t("corporateName")}</Text>
-      <TextInput
+      <CustomInput
+        onChange={() => {}}
         style={[styles.input, styles.disabledInput]}
-        value={companyEdit.corporateName}
+        value={companyEdit.corporateName || ""}
         editable={false}
       />
 
       <Text style={styles.label}>{t("fantasyName")}</Text>
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.fantasyName}
-        onChangeText={(text) => onChange("fantasyName", text)}
+        value={companyEdit.fantasyName || ""}
+        onChange={(text: any) => onChange("fantasyName", text)}
       />
 
       <Text style={styles.label}>{t("address")}</Text>
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.street}
+        value={companyEdit.address?.street || ""}
         placeholder={t("street")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, street: text })
         }
       />
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.number}
+        value={companyEdit.address?.number || ""}
         placeholder={t("number")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, number: text })
         }
       />
 
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.complement}
+        value={companyEdit.address?.complement || ""}
         placeholder={t("complement")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, complement: text })
         }
       />
 
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.city}
+        value={companyEdit.address?.city || "" }
         placeholder={t("city")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, city: text })
         }
       />
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.state}
+        value={companyEdit.address?.state || ""}
         placeholder={t("state")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, state: text })
         }
       />
-      <TextInput
+      <CustomInput
         style={styles.input}
-        value={companyEdit.address?.zipCode}
+        value={companyEdit.address?.zipCode || ""}
         placeholder={t("zipCode")}
-        onChangeText={(text) =>
+        onChange={(text: any) =>
           onChange("address", { ...companyEdit.address, zipCode: text })
         }
       />
