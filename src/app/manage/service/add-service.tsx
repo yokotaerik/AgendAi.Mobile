@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-import { useAuth } from "../../contexts/AuthContext";
-import api from "../../api";
+import { useAuth } from "../../../contexts/AuthContext";
+import api from "../../../api";
 import { useTranslation } from "react-i18next";
-import useTimeSpan from "../../hooks/utils/useTimeSpan";
-import { UpdateServiceDto } from "../../types/service";
+import useTimeSpan from "../../../hooks/utils/useTimeSpan";
+import { UpdateServiceDto } from "../../../types/service";
 
 export default function AddService() {
   const { t } = useTranslation();

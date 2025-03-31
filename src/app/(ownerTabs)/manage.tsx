@@ -65,14 +65,14 @@ export default function ManageCompany() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("/manage/add-service")}
+              onPress={() => router.push("/manage/service/add-service")}
             >
               <Text style={styles.buttonText}>Adicionar Serviço</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("/manage/add-employee")}
+              onPress={() => router.push("/manage/employee/add-employee")}
             >
               <Text style={styles.buttonText}>Adicionar Funcionário</Text>
             </TouchableOpacity>
@@ -91,7 +91,7 @@ export default function ManageCompany() {
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() =>
-                      router.push(`/manage/edit-service/${item.id}`)
+                      router.push(`/manage/service/edit-service/${item.id}`)
                     }
                   >
                     <ServiceCard service={item}/>
@@ -121,7 +121,7 @@ export default function ManageCompany() {
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() =>
-                      router.push(`/manage/edit-employee/${item.id}`)
+                      router.push(`/manage/employee/edit-employee/${item.id}`)
                     }
                   >
                     <BasicInfoCard basicInfo={{ id: item.id, completeName: item.completeName , imageUrl: item.imageUrl}} />
