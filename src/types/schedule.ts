@@ -27,3 +27,23 @@ export enum DayOfWeek {
   Friday = 5,
   Saturday = 6,
 }
+
+export interface ScheduleDto {
+  id: string;
+  date: string; 
+  employeeId: string;
+  avaiblePeriods: AvaiblePeriodDto[];
+  default: boolean;
+}
+
+export interface EmployeeScheduleDto
+{
+    employeeName: string;
+    imageUrl?: string;
+    schedules: ScheduleDto[];
+}
+
+export interface AvailableTime {
+  time: string;
+  available: boolean;
+}

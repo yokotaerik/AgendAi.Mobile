@@ -15,13 +15,16 @@ import BasicInfoCard from "../../components/ui/BasicInfoCard";
 import { useGetCompany } from "../../hooks/company/companyHooks";
 import { BasicInfoDto } from "../../types/common";
 import { useAuth } from "../../contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ServiceTabs from "../../components/company/tabs/ServiceTabs";
+import EmployeeTab from "../../components/company/tabs/EmployeeTab";
 
 export default function CompanyDetails() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const { companyId, signed, user } = useAuth();
   const { company, loading, error, fetchCompany } = useGetCompany();
+  const [activeTab, setActiveTab] = useState("services");
 
   useEffect(() => {
     if (id) fetchCompany(id as string);
@@ -84,40 +87,47 @@ export default function CompanyDetails() {
             </Text>
           </View>
 
-          <Text style={styles.sectionTitle}>Serviços</Text>
-          <View style={styles.servicesContainer}>
-            {company?.services && company.services.length > 0 ? (
-              <FlatList
-                scrollEnabled={true}
-                horizontal={true}
-                data={company.services}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.flatListContent}
-                renderItem={({ item }) => <ServiceCard service={item} />}
-                ListEmptyComponent={() => (
-                  <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
-                )}
-              />
-            ) : (
-              <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
-            )}
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[
+                styles.tabButton,
+                activeTab === "services" ? styles.activeTabButton : null,
+              ]}
+              onPress={() => setActiveTab("services")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "services" ? styles.activeTabText : null,
+                ]}
+              >
+                {t("services")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.tabButton,
+                activeTab === "professionals" ? styles.activeTabButton : null,
+              ]}
+              onPress={() => setActiveTab("professionals")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "professionals" ? styles.activeTabText : null,
+                ]}
+              >
+                {t("employees")}
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <Text style={styles.sectionTitle}>Profissionais</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.employeesContainer}>
-              {company?.employees?.map(
-                (employee: BasicInfoDto, index: number) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => router.navigate(`/employee/${employee.id}`)}
-                  >
-                    <BasicInfoCard basicInfo={employee} />
-                  </TouchableOpacity>
-                )
-              )}
-            </View>
-          </ScrollView>
+          <View>
+            {activeTab === "services" ? (
+              <ServiceTabs services={company?.services || []} />
+            ) : activeTab === "professionals" ? (
+              <EmployeeTab employees={company?.employees || []} />
+            ) : null}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -190,5 +200,26 @@ const styles = StyleSheet.create({
   employeesContainer: {
     flexDirection: "row",
     gap: 15,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  tabButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    backgroundColor: "#f0f0f0",
+  },
+  activeTabButton: {
+    backgroundColor: "#0099ff",
+  },
+  tabText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  activeTabText: {
+    color: "#fff",
   },
 });

@@ -71,7 +71,7 @@ export const ScheduleSummary: React.FC<ScheduleSummaryProps> = ({
           </View>
         )})}
       </View>
-
+{/* 
       {specificSchedules.schedules.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("scheduleSummary.specificSchedule")}</Text>
@@ -86,7 +86,7 @@ export const ScheduleSummary: React.FC<ScheduleSummaryProps> = ({
             </View>
           ))}
         </View>
-      )}
+      )} */}
     </ScrollView>
   );
 };

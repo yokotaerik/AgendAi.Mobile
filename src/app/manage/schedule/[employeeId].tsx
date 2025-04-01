@@ -1,25 +1,24 @@
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, ScrollView, TouchableOpacity, Text } from "react-native";
 import {
   RegisterDefaultSchedulesDto,
   RegisterSchedulesDto,
   AvaiblePeriodDto,
   DayOfWeek,
+  ScheduleDto,
+  RegisterScheduleDto,
 } from "../../../types/schedule";
 import { useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next"; // Added translation hook
 import DefaultScheduleEditor from "../../../components/schedule/editors/DefaultScheduleEditor";
 import SpecificDayScheduleEditor from "../../../components/schedule/editors/SpecificDayScheduleEditor";
 import { ScheduleSummary } from "../../../components/schedule/ui";
-
-// Specific Day Schedule Component
+import { globalStyles } from "../../../styles/global";
+import styles from "../../../components/schedule/styles";
+import api from "../../../api";
 
 export default function EmployeeScheduleScreen() {
+  const { t } = useTranslation();
   const { employeeId } = useLocalSearchParams<{ employeeId: string }>();
   const [showSummary, setShowSummary] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -36,6 +35,10 @@ export default function EmployeeScheduleScreen() {
         [DayOfWeek.Saturday]: [],
       },
     });
+  const [isDefaultScheduleExpanded, setIsDefaultScheduleExpanded] =
+    useState(false);
+  const [isSpecificScheduleExpanded, setIsSpecificScheduleExpanded] =
+    useState(false);
 
   const [specificSchedules, setSpecificSchedules] =
     useState<RegisterSchedulesDto>({
@@ -86,21 +89,74 @@ export default function EmployeeScheduleScreen() {
     });
   };
 
-  const handleSave = async () => {
-    // TODO: Implementar chamada à API para salvar as alterações
-    console.log("Salvando agenda:", defaultSchedules.defaultPeriods[0]);
+  const getSchedules = async () => {
+    const response = await api.get<ScheduleDto[]>(`/schedule/${employeeId}`);
+    if (response.status === 200) {
+      const defaultSchedulesResponse = response.data
+        .filter((s) => s.default === true);
+      
+      const newDefaultPeriods = {
+        [DayOfWeek.Sunday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Monday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Tuesday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Wednesday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Thursday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Friday]: [] as AvaiblePeriodDto[],
+        [DayOfWeek.Saturday]: [] as AvaiblePeriodDto[],
+      };
+
+      defaultSchedulesResponse.forEach((schedule) => {
+        const date = new Date(schedule.date);
+        date.setHours(date.getHours() + 12); 
+        console.log("Schedule", schedule.date);
+        console.log("Data", date);
+        const dayOfWeek = date.getDay() as DayOfWeek;
+        console.log("Dia da semana", dayOfWeek);
+
+        const periods: AvaiblePeriodDto[] = schedule.avaiblePeriods.map(period => ({
+          start: new Date(period.start),
+          end: new Date(period.end)
+        }));
+        
+        newDefaultPeriods[dayOfWeek] = periods;
+      });
+      
+      setDefaultSchedules(prev => ({
+        ...prev,
+        defaultPeriods: newDefaultPeriods,
+      }));
+    } else {
+      alert(t("errorFetchingSchedules"));
+    }
   };
 
+  const handleSaveDefault = async () => {
+    const response = await api.post("/schedule/default", defaultSchedules);
+    if (response.status === 200) {
+      alert(t("scheduleSaved"));
+    } else {
+      alert(t("errorSavingSchedule"));
+    }
+  };
+
+  const handleSaveSpecific = async () => {};
+
+  useEffect(() => {
+    getSchedules();
+  }, []);
+
   return (
-    <ScrollView style={stylesSchedulePage.container}>
-      <View style={stylesSchedulePage.header}>
-        <Text style={stylesSchedulePage.title}>Editar Agenda</Text>
+    <ScrollView style={[globalStyles.container, styles.container]}>
+      <View
+        style={[globalStyles.row, globalStyles.spaceBetween, styles.header]}
+      >
+        <Text style={globalStyles.title}>{t("editSchedule")}</Text>
         <TouchableOpacity
-          style={stylesSchedulePage.summaryButton}
+          style={styles.summaryButton}
           onPress={() => setShowSummary(!showSummary)}
         >
-          <Text style={stylesSchedulePage.summaryButtonText}>
-            {showSummary ? "Editar" : "Ver Resumo"}
+          <Text style={styles.summaryButtonText}>
+            {showSummary ? t("edit") : t("viewSummary")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -112,89 +168,53 @@ export default function EmployeeScheduleScreen() {
         />
       ) : (
         <>
-          <DefaultScheduleEditor
-            defaultPeriods={defaultSchedules.defaultPeriods}
-            onPeriodsChange={handleDefaultPeriodsChange}
-          />
+          <View style={styles.collapsibleSection}>
+            <TouchableOpacity
+              onPress={() =>
+                setIsDefaultScheduleExpanded(!isDefaultScheduleExpanded)
+              }
+              style={styles.collapsibleHeader}
+            >
+              <Text style={styles.collapsibleTitle}>
+                {t("defaultSchedule")}
+              </Text>
+              <Text>{isDefaultScheduleExpanded ? "▲" : "▼"}</Text>
+            </TouchableOpacity>
 
-          <SpecificDayScheduleEditor
-            selectedDate={selectedDate}
-            specificSchedules={specificSchedules}
-            onDaySelect={handleDaySelect}
-            onPeriodsChange={handleSpecificDayPeriodsChange}
-          />
+            {isDefaultScheduleExpanded && (
+              <DefaultScheduleEditor
+                defaultPeriods={defaultSchedules.defaultPeriods}
+                onPeriodsChange={handleDefaultPeriodsChange}
+                onSave={handleSaveDefault}
+              />
+            )}
+          </View>
+{/* 
+          <View style={styles.collapsibleSection}>
+            <TouchableOpacity
+              onPress={() =>
+                setIsSpecificScheduleExpanded(!isSpecificScheduleExpanded)
+              }
+              style={styles.collapsibleHeader}
+            >
+              <Text style={styles.collapsibleTitle}>
+                {t("defaultSchedule")}
+              </Text>
+              <Text>{isSpecificScheduleExpanded ? "▲" : "▼"}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={stylesSchedulePage.saveButton}
-            onPress={handleSave}
-          >
-            <Text style={stylesSchedulePage.saveButtonText}>
-              Salvar Alterações
-            </Text>
-          </TouchableOpacity>
+            {isSpecificScheduleExpanded && (
+              <SpecificDayScheduleEditor
+                selectedDate={selectedDate}
+                specificSchedules={specificSchedules}
+                onDaySelect={handleDaySelect}
+                onPeriodsChange={handleSpecificDayPeriodsChange}
+                onSave={handleSaveSpecific}
+              />
+            )}
+          </View> */}
         </>
       )}
     </ScrollView>
   );
 }
-
-export const stylesSchedulePage = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  componentContainer: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  componentTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#333",
-  },
-  summaryButton: {
-    padding: 8,
-    backgroundColor: "#e3f2fd",
-    borderRadius: 4,
-  },
-  summaryButtonText: {
-    color: "#1976d2",
-    fontWeight: "500",
-  },
-  saveButton: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#1976d2",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

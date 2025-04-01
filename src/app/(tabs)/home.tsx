@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CompanyCard } from "../../components/company/CompanyCard";
 import { useListCompanies } from "../../hooks/company/companyHooks";
 import { useAuth } from "../../contexts/AuthContext";
+import BookingScreen from "../booking";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -57,6 +58,15 @@ export default function Home() {
         }
       />
     </SafeAreaView>
+    // <BookingScreen onAddAnotherService={() => {}}
+    // onConfirmBooking={() => {}}
+    // service={{         "id": "e1bf8504-f90a-48e8-9b1d-52a389a75efc",
+    //   "name": "Corte tesoura curto",
+    //   "description": "Simples",
+    //   "price": 200,
+    //   "duration": "00:20:00",
+    //   "companyId": "355d1699-23dc-44d5-8247-6af49b2a9e80"}}
+    // />
   );
 }
 

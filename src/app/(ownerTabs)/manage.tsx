@@ -58,9 +58,9 @@ export default function ManageCompany() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("/manage/employee/add-employee")}
+              onPress={() => router.push("/manage/service/add")}
             >
-              <Text style={styles.buttonText}>Adicionar Funcionário</Text>
+              <Text style={styles.buttonText}>Adicionar Servico</Text>
             </TouchableOpacity>
           </View>
 

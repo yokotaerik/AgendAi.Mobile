@@ -1,25 +1,29 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import {
   RegisterSchedulesDto,
   AvaiblePeriodDto,
 } from "../../../types/schedule";
 import { MonthCalendar, DayScheduleEditor } from "../ui";
-import { stylesSchedulePage as styles } from "../../../app/manage/schedule/[employeeId]";
+import styles from "../styles";
+import { globalStyles } from "../../../styles/global";
+import { useTranslation } from "react-i18next";
 
 const SpecificDayScheduleEditor = ({
   selectedDate,
   specificSchedules,
   onDaySelect,
   onPeriodsChange,
+  onSave,
 }: {
   selectedDate: string | null;
   specificSchedules: RegisterSchedulesDto;
   onDaySelect: (date: string) => void;
   onPeriodsChange: (periods: AvaiblePeriodDto[]) => void;
+  onSave: () => void;
 }) => {
+  const { t } = useTranslation();
   return (
-    <View style={styles.componentContainer}>
-      <Text style={styles.componentTitle}>Agendas Específicas</Text>
+    <View>
       <MonthCalendar
         onDaySelect={onDaySelect}
         markedDates={specificSchedules.schedules.reduce(
@@ -46,6 +50,12 @@ const SpecificDayScheduleEditor = ({
           onPeriodsChange={onPeriodsChange}
         />
       )}
+      <TouchableOpacity
+        style={[globalStyles.button, styles.saveButton]}
+        onPress={onSave}
+      >
+        <Text style={globalStyles.buttonText}>{t("saveChanges")}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
