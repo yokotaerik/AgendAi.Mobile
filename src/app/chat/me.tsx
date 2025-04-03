@@ -27,7 +27,6 @@ export default function ChatList() {
       setLoading(true);
       const response = await api.get('/message/chat');
       setChats(response.data as ChatDto[]);
-      console.log(chats)
     } catch (error) {
       console.error('Erro ao carregar chats:', error);
     } finally {

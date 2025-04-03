@@ -12,6 +12,7 @@ interface AuthContextData {
   user: UserInfo | null;
   owner: CompanyOwnerDto | null;
   companyId: string | null;
+  customerId: string | null;
   signIn(data: LoginDto): Promise<boolean>;
   signOut(): void;
 }
@@ -26,6 +27,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [owner, setOwner] = useState<CompanyOwnerDto | null>(null);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [signed, setSigned] = useState<boolean>(false);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
   async function signIn(data: LoginDto) {
     try {
@@ -45,20 +47,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       var userData = userInfoResponse.data as UserInfo;
 
       setUser(userData);
-      
 
       if (userData.role === UserType.Employee) {
         var employeeInfoResponse = (await api.get(
           `/employee/email/${userData.email}`
         )) as any;
-
-        console.log(userData.email);
-        console.log("~~~~~~~~~~~~~~~~~~~~~");
-        
-        console.log(employeeInfoResponse.data);
-        
-        
-
         setCompanyId(employeeInfoResponse?.data?.company?.id as string);
 
         if (employeeInfoResponse.data.owner == true) {
@@ -67,6 +60,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       if (userData.role === UserType.Customer) {
+        var customerResponse = (await api.get(
+          "/customer/email/" + userData.email
+        )) as any;
+        const costumerIdResponse = customerResponse.data.id as string;
+        setCustomerId(costumerIdResponse);
+        
         router.replace("/home");
       }
 
@@ -94,6 +93,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         user,
         owner,
         companyId,
+        customerId,
         signIn,
         signOut,
       }}
@@ -110,4 +110,3 @@ export function useAuth() {
   }
   return context;
 }
-

@@ -108,10 +108,7 @@ export default function EmployeeScheduleScreen() {
       defaultSchedulesResponse.forEach((schedule) => {
         const date = new Date(schedule.date);
         date.setHours(date.getHours() + 12); 
-        console.log("Schedule", schedule.date);
-        console.log("Data", date);
         const dayOfWeek = date.getDay() as DayOfWeek;
-        console.log("Dia da semana", dayOfWeek);
 
         const periods: AvaiblePeriodDto[] = schedule.avaiblePeriods.map(period => ({
           start: new Date(period.start),

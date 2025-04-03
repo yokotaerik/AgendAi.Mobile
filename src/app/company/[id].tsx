@@ -18,6 +18,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ServiceTabs from "../../components/company/tabs/ServiceTabs";
 import EmployeeTab from "../../components/company/tabs/EmployeeTab";
+import { ServiceDto } from "../../types/service";
+import BookingScreen from "../../components/booking/BookingScreen";
 
 export default function CompanyDetails() {
   const { t } = useTranslation();
@@ -25,6 +27,8 @@ export default function CompanyDetails() {
   const { companyId, signed, user } = useAuth();
   const { company, loading, error, fetchCompany } = useGetCompany();
   const [activeTab, setActiveTab] = useState("services");
+  const [showBooking, setShowBooking] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<ServiceDto[]>([]);
 
   useEffect(() => {
     if (id) fetchCompany(id as string);
@@ -36,6 +40,11 @@ export default function CompanyDetails() {
       return;
     }
     router.push("/auth/login");
+  };
+
+  const handleStartBooking = (services: ServiceDto[]) => {
+    setSelectedServices(services);
+    setShowBooking(true);
   };
 
   if (loading) {
@@ -51,6 +60,15 @@ export default function CompanyDetails() {
       <View style={styles.errorContainer}>
         <Text>{t("error.loadCompany")}</Text>
       </View>
+    );
+  }
+
+  if (showBooking) {
+    return (
+      <BookingScreen
+        services={selectedServices}
+        onConfirmBooking={() => {}}
+      />
     );
   }
 
@@ -123,7 +141,12 @@ export default function CompanyDetails() {
           </View>
           <View>
             {activeTab === "services" ? (
-              <ServiceTabs services={company?.services || []} />
+              <ServiceTabs
+                onServiceSelect={(services) => {
+                  handleStartBooking(services);
+                }}
+                services={company?.services || []}
+              />
             ) : activeTab === "professionals" ? (
               <EmployeeTab employees={company?.employees || []} />
             ) : null}

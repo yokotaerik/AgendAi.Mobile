@@ -10,7 +10,6 @@ import Login from "../auth/login";
 const Profile = () => {
   const { t } = useTranslation();
   const { signed, signOut } = useAuth();
-  console.log(signed);
 
   if (signed == false) {
     return <Login />;

@@ -11,6 +11,8 @@ import { useTranslation } from "react-i18next";
 import { router } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import EmployeeCard from "../../../components/employee/EmployeeCard";
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 
 const ManageEmployees: React.FC = () => {
   const {
@@ -21,18 +23,20 @@ const ManageEmployees: React.FC = () => {
   const { t } = useTranslation();
   const { companyId } = useAuth();
 
-  useEffect(() => {
-    if (companyId != null) {
-      fetchEmployees(companyId);
-    }
-  }, [companyId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (companyId != null) {
+        fetchEmployees(companyId);
+      }
+    }, [companyId, fetchEmployees])
+  );
 
   return (
     <SafeAreaView style={globalStyles.section}>
       <Text style={globalStyles.title}>{t("employees")}</Text>
       <TouchableOpacity
         style={globalStyles.button}
-        onPress={() => router.push("/manage/employee/create")}
+        onPress={() => router.push("/manage/employee/add")}
       >
         <Text style={globalStyles.buttonText}>{t("addEmployee")}</Text>
       </TouchableOpacity>

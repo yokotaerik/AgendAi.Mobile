@@ -6,7 +6,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CompanyCard } from "../../components/company/CompanyCard";
 import { useListCompanies } from "../../hooks/company/companyHooks";
 import { useAuth } from "../../contexts/AuthContext";
-import BookingScreen from "../booking";
 
 export default function Home() {
   const { t } = useTranslation();
