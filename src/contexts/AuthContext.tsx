@@ -82,6 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setOwner(null);
     setCompanyId(null);
     setSigned(false);
+    setCustomerId(null);
     api.defaults.headers.common["Authorization"] = "";
     router.replace("/home");
   }

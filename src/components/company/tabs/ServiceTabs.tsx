@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,32 +14,45 @@ import { router } from "expo-router";
 interface ServiceTabsProps {
   services: ServiceDto[];
   onServiceSelect: (selectedServices: ServiceDto[]) => void;
+  giveSelectedServices?: (services: ServiceDto[]) => void;
 }
 
-const ServiceTabs: React.FC<ServiceTabsProps> = ({ services, onServiceSelect }) => {
+const ServiceTabs: React.FC<ServiceTabsProps> = ({
+  services,
+  onServiceSelect,
+  giveSelectedServices,
+}) => {
   const { t } = useTranslation();
   const { customerId } = useAuth();
   const [selectedServices, setSelectedServices] = useState<ServiceDto[]>([]);
 
+  useEffect(() => {
+    if (giveSelectedServices) {
+      setSelectedServices(selectedServices);
+    }
+  }, [giveSelectedServices]);
+
   const toggleServiceSelection = (service: ServiceDto) => {
-    const isSelected = selectedServices.some(item => item.id === service.id);
+    const isSelected = selectedServices.some((item) => item.id === service.id);
     let updatedSelection;
-    
+
     if (isSelected) {
-      updatedSelection = selectedServices.filter(item => item.id !== service.id);
+      updatedSelection = selectedServices.filter(
+        (item) => item.id !== service.id
+      );
     } else {
       updatedSelection = [...selectedServices, service];
     }
-    
+
     setSelectedServices(updatedSelection);
   };
 
   const isServiceSelected = (serviceId: string) => {
-    return selectedServices.some(service => service.id === serviceId);
+    return selectedServices.some((service) => service.id === serviceId);
   };
 
   const handleBookNow = () => {
-    if(!customerId) {
+    if (!customerId) {
       router.push("/auth/login");
       return;
     }
@@ -50,9 +63,8 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({ services, onServiceSelect }) 
     <TouchableOpacity
       style={[
         styles.serviceItem,
-        isServiceSelected(item.id) && styles.selectedServiceItem
+        isServiceSelected(item.id) && styles.selectedServiceItem,
       ]}
-      onPress={() => toggleServiceSelection(item)}
     >
       <View>
         <Text style={styles.serviceName}>{item.name}</Text>
@@ -65,18 +77,30 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({ services, onServiceSelect }) 
         </View>
         <View>
           {isServiceSelected(item.id) ? (
-            <View style={{ padding: 8, backgroundColor: "#4caf50", borderRadius: 5 }}>
+            <TouchableOpacity
+              onPress={(e) => {
+                toggleServiceSelection(item);
+              }}
+              style={{
+                padding: 8,
+                backgroundColor: "#4caf50",
+                borderRadius: 5,
+              }}
+            >
               <Text style={{ color: "#fff", fontWeight: "600" }}>
                 {t("selected")}
               </Text>
-            </View>
+            </TouchableOpacity>
           ) : (
             <TouchableOpacity
               onPress={(e) => {
-                e.stopPropagation();
                 toggleServiceSelection(item);
               }}
-              style={{ padding: 8, backgroundColor: "#1976d2", borderRadius: 5 }}
+              style={{
+                padding: 8,
+                backgroundColor: "#1976d2",
+                borderRadius: 5,
+              }}
             >
               <Text style={{ color: "#fff", fontWeight: "600" }}>
                 {t("select")}
@@ -96,10 +120,7 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({ services, onServiceSelect }) 
         keyExtractor={(item) => item.id}
       />
       {selectedServices.length > 0 && (
-        <TouchableOpacity
-          style={styles.bookButton}
-          onPress={handleBookNow}
-        >
+        <TouchableOpacity style={styles.bookButton} onPress={handleBookNow}>
           <Text style={styles.bookButtonText}>
             {t("bookNow")} ({selectedServices.length})
           </Text>

@@ -30,14 +30,25 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
 
   const renderEmployeeItem = ({ item }: { item: Employee }) => (
     <TouchableOpacity
+      onPress={() => onEmployeeSelect(item.id)}
       style={[
-        styles.employeeItem,
+        styles.employeeContainer,
         selectedEmployee === item.id && styles.selectedEmployee,
       ]}
-      onPress={() => onEmployeeSelect(item.id)}
     >
-      <Image source={{ uri: item.photoUrl }} style={styles.employeePhoto} />
-      <Text style={styles.employeeName}>{item.name}</Text>
+      <View style={styles.employeeItem}>
+        <Image
+          source={
+            item.photoUrl
+              ? { uri: item.photoUrl }
+              : require("../../../assets/default-avatar.png")
+          }
+          style={styles.employeePhoto}
+        />
+      </View>
+      <Text style={styles.employeeName} numberOfLines={2} ellipsizeMode="tail">
+        {item.name}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -48,7 +59,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
         data={[{ id: "any", name: t("anyEmployee") }, ...employees]}
         renderItem={renderEmployeeItem}
         keyExtractor={(item) => item.id}
-        horizontal
+        horizontal={true}
         showsHorizontalScrollIndicator={false}
         style={styles.employeeList}
       />
@@ -72,9 +83,17 @@ const styles = StyleSheet.create({
     marginHorizontal: -16,
     paddingHorizontal: 16,
   },
+  employeeContainer: {
+    marginRight: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
+    borderRadius: 12,
+    width: 100,
+  },
   employeeItem: {
     alignItems: "center",
-    marginRight: 16,
+    justifyContent: "center",
   },
   employeePhoto: {
     width: 60,
@@ -85,12 +104,14 @@ const styles = StyleSheet.create({
   employeeName: {
     fontSize: 14,
     color: "#666",
+    textAlign: "center",
+    maxWidth: 80,
+    overflow: "hidden",
   },
   selectedEmployee: {
     borderWidth: 2,
     borderColor: "#007AFF",
-    borderRadius: 32,
-    padding: 2,
+    backgroundColor: "rgba(0, 122, 255, 0.1)",
   },
 });
 

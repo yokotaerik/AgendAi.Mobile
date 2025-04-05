@@ -1,19 +1,8 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ServiceCard from "../../components/service/ServiceCard";
-import BasicInfoCard from "../../components/ui/BasicInfoCard";
 import { useGetCompany } from "../../hooks/company/companyHooks";
-import { BasicInfoDto } from "../../types/common";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ServiceTabs from "../../components/company/tabs/ServiceTabs";
@@ -67,7 +56,10 @@ export default function CompanyDetails() {
     return (
       <BookingScreen
         services={selectedServices}
-        onConfirmBooking={() => {}}
+        attendance={null}
+        backHandler={() => {
+          setShowBooking(false);
+        }}
       />
     );
   }
@@ -82,7 +74,7 @@ export default function CompanyDetails() {
           <Text> Enviar mensagem </Text>
         </TouchableOpacity>
       ) : null}
-      <ScrollView>
+      <View>
         <Image
           source={{ uri: company?.imageUrls?.[0] }}
           style={styles.companyImage}
@@ -95,13 +87,8 @@ export default function CompanyDetails() {
           <View style={styles.addressContainer}>
             <Text style={styles.addressText}>
               {company?.address?.street}, {company?.address?.number}
-            </Text>
-            <Text style={styles.addressText}>
               {company?.address?.neighborhood} - {company?.address?.city}/
               {company?.address?.state}
-            </Text>
-            <Text style={styles.addressText}>
-              CEP: {company?.address?.zipCode}
             </Text>
           </View>
 
@@ -152,7 +139,7 @@ export default function CompanyDetails() {
             ) : null}
           </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

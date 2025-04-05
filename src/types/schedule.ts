@@ -1,3 +1,6 @@
+import { BasicInfoDto } from "./common";
+import { ServiceDto } from "./service";
+
 export interface RegisterDefaultSchedulesDto {
   employeeId: string;
   defaultPeriods: Record<DayOfWeek, AvaiblePeriodDto[]>;
@@ -47,3 +50,13 @@ export interface AvailableTime {
   time: string;
   available: boolean;
 }
+
+export interface AttendanceDto {
+  id: string;
+  dateTime: Date;
+  costumer: BasicInfoDto;
+  employee: BasicInfoDto;
+  services: ServiceDto[];
+  companyId: string;
+}
+

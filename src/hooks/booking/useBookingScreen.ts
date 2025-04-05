@@ -26,59 +26,93 @@ const useBookingScreen = () => {
     intervalMinutes: number = 15,
     serviceDurationMinutes: number = 0
   ): AvailableTime[] {
+    const safePeriods = periods.map(p => ({
+      ...p,
+      start: new Date(p.start),
+      end: new Date(p.end),
+    }));
+    
+    const mergedPeriods = mergeAvailablePeriods(safePeriods);
+    console.log("Períodos combinados:", mergedPeriods);
+
     const timeSlots: AvailableTime[] = [];
-  
-    periods.forEach((period) => {
-      const baseDate = new Date();
-      
-      // Extrair apenas horas e minutos
-      const startTime = new Date(period.start);
-      const endTime = new Date(period.end);
-      
-      const normalizedStartTime = new Date(baseDate);
-      normalizedStartTime.setHours(
-        startTime.getHours(),
-        startTime.getMinutes(),
-        0,
-        0
+    const baseDate = new Date(); // Usado apenas para normalização
+
+    mergedPeriods.forEach((period) => {
+      const start = new Date(period.start);
+      const end = new Date(period.end);
+
+      // Normaliza as horas/minutos para o mesmo dia (baseDate)
+      const normalizedStart = new Date(baseDate);
+      normalizedStart.setHours(start.getHours(), start.getMinutes(), 0, 0);
+
+      const normalizedEnd = new Date(baseDate);
+      normalizedEnd.setHours(end.getHours(), end.getMinutes(), 0, 0);
+
+      // Ajusta o fim considerando a duração do serviço
+      const adjustedEnd = new Date(
+        normalizedEnd.getTime() - serviceDurationMinutes * 60000
       );
-      
-      const normalizedEndTime = new Date(baseDate);
-      normalizedEndTime.setHours(
-        endTime.getHours(),
-        endTime.getMinutes(),
-        0,
-        0
-      );
-      
-      // Ajustar o endTime considerando a duração do serviço
-      const adjustedEndTime = new Date(normalizedEndTime);
-      adjustedEndTime.setMinutes(adjustedEndTime.getMinutes() - serviceDurationMinutes);
-      
-      console.log("Período ajustado para duração:", {
-        start: normalizedStartTime.toISOString(),
-        end: adjustedEndTime.toISOString(),
-        serviceDuration: `${serviceDurationMinutes} minutos`
-      });
-      
-      let currentTime = new Date(normalizedStartTime);
-      
-      // Use adjustedEndTime para comparação
-      while (currentTime <= adjustedEndTime) {
-        const hours = currentTime.getHours().toString().padStart(2, "0");
-        const minutes = currentTime.getMinutes().toString().padStart(2, "0");
-        const timeString = `${hours}:${minutes}`;
-        
-        timeSlots.push({
-          time: timeString,
-          available: true,
-        });
-        
-        currentTime.setMinutes(currentTime.getMinutes() + intervalMinutes);
+
+      // Gera os slots de tempo
+      let current = new Date(normalizedStart);
+      while (current <= adjustedEnd) {
+        const timeString = `${current
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${current
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`;
+        timeSlots.push({ time: timeString, available: true });
+
+        current = new Date(current.getTime() + intervalMinutes * 60000);
       }
     });
-  
+
     return timeSlots;
+  }
+
+  function areTimesEqual(date1: Date, date2: Date): boolean {
+    return (
+      date1.getHours() === date2.getHours() &&
+      date1.getMinutes() === date2.getMinutes()
+    );
+  }
+  
+  function mergeAvailablePeriods(periods: AvaiblePeriodDto[]): AvaiblePeriodDto[] {
+    console.log("Períodos antes da ordenação:", periods);
+
+    periods.sort((a, b) => {
+      const dateDiff = a.start.getTime() - b.start.getTime();
+      return dateDiff;
+    });
+  
+    const merged: AvaiblePeriodDto[] = [];
+    let current: AvaiblePeriodDto | null = null;
+  
+    for (const period of periods) {
+      if (!current) {
+        current = { ...period };
+      } else if (areTimesEqual(current.end, period.start)) {
+        current.end = getLaterTime(current.end, period.end);
+      } else {
+        merged.push(current);
+        current = { ...period };
+      }
+    }
+  
+    if (current) {
+      merged.push(current);
+    }
+  
+    return merged;
+  }
+
+  function getLaterTime(date1: Date, date2: Date): Date {
+    const d1Minutes = date1.getHours() * 60 + date1.getMinutes();
+    const d2Minutes = date2.getHours() * 60 + date2.getMinutes();
+    return d1Minutes >= d2Minutes ? date1 : date2;
   }
 
   return {

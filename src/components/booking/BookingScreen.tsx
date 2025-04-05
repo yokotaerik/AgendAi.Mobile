@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  BackHandler,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { ServiceDto } from "../../types/service";
@@ -15,22 +16,27 @@ import TimeList from "./TimeList";
 import { useBooking } from "../../hooks/booking/useBooking";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../api";
+import { AttendanceDto } from "../../types/schedule";
+import { router } from "expo-router";
 
 interface BookingScreenProps {
   services: ServiceDto[];
-  onConfirmBooking: (bookingData: BookingData) => void;
+  attendance: AttendanceDto | null
+  backHandler: () => void;
 }
 
 interface BookingData {
+  id? : string;
   serviceIds: string[];
-  customerId: string;
+  customerId?: string;
   employeeId?: string;
   appointment: string;
 }
 
 const BookingScreen: React.FC<BookingScreenProps> = ({
   services,
-  onConfirmBooking,
+  backHandler,
+  attendance = null,
 }) => {
   const { t } = useTranslation();
   const { customerId } = useAuth();
@@ -45,11 +51,32 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     handleEmployeeSelect,
     handleServiceSelect,
   } = useBooking(services);
+  
+  useEffect(() => {
+    if (attendance) {
+
+      console.log(services);
+      
+      console.log(attendance.dateTime)
+
+      handleEmployeeSelect(attendance.employee.id);
+    }
+  }, [attendance]);
 
   useEffect(() => {
     handleServiceSelect(services);
   }, [services]);
 
+  useEffect(() => {
+    const backHandlerSubscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      backHandler();
+      return true; // Indicates that we've handled the back button press
+    });
+
+    // Clean up the event listener when component unmounts
+    return () => backHandlerSubscription.remove();
+  }, [backHandler]);
+  
   const handleConfirm = async () => {
     if (
       !selectedDate ||
@@ -67,27 +94,46 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       console.error("Customer ID is not available.");
       return;
     }
-    
+
     const selectedDateTime = new Date(selectedDate);
-    
+
     const [hours, minutes] = selectedTime.split(":").map(Number);
     selectedDateTime.setUTCHours(hours, minutes, 0, 0);
 
-    const timezoneOffset = new Date().getTimezoneOffset() / 60; 
+    const timezoneOffset = new Date().getTimezoneOffset() / 60;
 
-    selectedDateTime.setHours(selectedDateTime.getHours() + timezoneOffset); 
-    
+    selectedDateTime.setHours(selectedDateTime.getHours() + timezoneOffset);
 
-    const bookingData: BookingData = {
+    let bookingData: BookingData;
+
+    if(attendance == undefined) {
+       bookingData = {
       serviceIds: services.map((service) => service.id),
       employeeId: selectedEmployee,
       customerId,
       appointment: selectedDateTime.toISOString(),
-    };
+    }; }else {
+      bookingData = {
+        id: attendance.id,
+        serviceIds: services.map((service) => service.id),
+        employeeId: selectedEmployee,
+        appointment: selectedDateTime.toISOString(),
+      };
+    }
 
     try {
-      await api.post("/attendance", bookingData);
-      
+      let response;
+
+      if (attendance == undefined) {
+          response = await api.post("/attendance", bookingData);
+      }
+      else {
+        response = await api.put("/attendance", bookingData);
+      }
+
+      if(response.status === 200) {
+          router.push("/tabs/attendances")
+      }
     } catch {
       return;
     }
@@ -112,14 +158,13 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             onDayPress={(day: any) => handleDateSelect(day.dateString)}
             onMonthChange={(month: any) => handleDateSelect(month.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: "#007AFF" },
+              [selectedDate]: { selected: true, selectedColor: "#007AFF", },
             }}
             theme={{
               selectedDayBackgroundColor: "#007AFF",
               todayTextColor: "#007AFF",
               arrowColor: "#007AFF",
             }}
-            locale={ptBR}
           />
         </View>
 

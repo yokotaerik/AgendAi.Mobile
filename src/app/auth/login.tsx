@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import CustomInput from "../../components/ui/input/CustomInput";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -33,6 +34,12 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity
+        onPress={() => router.navigate("/home")}
+        style={{ position: "absolute", top: 50, left: 20 }}
+      >
+        <Text style={{ fontSize: 16 }}><Ionicons name={"arrow-back"} size={20}/></Text>
+      </TouchableOpacity>
       <View style={styles.content}>
         <Text style={styles.title}>{t("login.title")}</Text>
 

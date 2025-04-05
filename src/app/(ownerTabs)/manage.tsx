@@ -77,7 +77,7 @@ export default function ManageCompany() {
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() =>
-                      router.push(`/manage/service/edit-service/${item.id}`)
+                      router.push(`/manage/service/edit/${item.id}`)
                     }
                   >
                     <ServiceCard service={item} />

@@ -51,7 +51,8 @@ const TimeList: React.FC<TimeListProps> = ({
         data={availableTimes}
         renderItem={renderTimeItem}
         keyExtractor={(item) => item.time}
-        numColumns={3}
+        numColumns={1}
+        horizontal={true}
         contentContainerStyle={styles.timeList}
       />
     </View>

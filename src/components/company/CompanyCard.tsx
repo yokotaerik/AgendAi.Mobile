@@ -20,7 +20,6 @@ export function CompanyCard({ company }: CompanyCardProps) {
         {company.address && (
           <Text style={styles.address}>
             {company.address.street}, {company.address.number}
-            {"\n"}
             {company.address.city} - {company.address.state}
           </Text>
         )}

@@ -90,11 +90,14 @@ export default function EmployeeScheduleScreen() {
   };
 
   const getSchedules = async () => {
-    const response = await api.get<ScheduleDto[]>(`/schedule/${employeeId}`);
+    const response = await api.get<ScheduleDto[]>(
+      `/schedule/employee/${employeeId}`
+    );
     if (response.status === 200) {
-      const defaultSchedulesResponse = response.data
-        .filter((s) => s.default === true);
-      
+      const defaultSchedulesResponse = response.data.filter(
+        (s) => s.default === true
+      );
+
       const newDefaultPeriods = {
         [DayOfWeek.Sunday]: [] as AvaiblePeriodDto[],
         [DayOfWeek.Monday]: [] as AvaiblePeriodDto[],
@@ -107,20 +110,39 @@ export default function EmployeeScheduleScreen() {
 
       defaultSchedulesResponse.forEach((schedule) => {
         const date = new Date(schedule.date);
-        date.setHours(date.getHours() + 12); 
+        date.setHours(date.getHours() + 12);
         const dayOfWeek = date.getDay() as DayOfWeek;
 
-        const periods: AvaiblePeriodDto[] = schedule.avaiblePeriods.map(period => ({
-          start: new Date(period.start),
-          end: new Date(period.end)
-        }));
-        
+        const periods: AvaiblePeriodDto[] = schedule.avaiblePeriods.map(
+          (period) => ({
+            start: new Date(period.start),
+            end: new Date(period.end),
+          })
+        );
+
         newDefaultPeriods[dayOfWeek] = periods;
       });
-      
-      setDefaultSchedules(prev => ({
+
+      setDefaultSchedules((prev) => ({
         ...prev,
         defaultPeriods: newDefaultPeriods,
+      }));
+
+      const otherPeiods = response.data.filter((s) => s.default === false);
+      const newSpecificSchedules = otherPeiods.map((schedule) => {
+        const date = new Date(schedule.date);
+        date.setHours(date.getHours() + 12);
+        return {
+          date: date.toISOString(),
+          avaiblePeriods: schedule.avaiblePeriods.map((period) => ({
+            start: new Date(period.start),
+            end: new Date(period.end),
+          })),
+        };
+      });
+      setSpecificSchedules((prev) => ({
+        ...prev,
+        schedules: newSpecificSchedules,
       }));
     } else {
       alert(t("errorFetchingSchedules"));
@@ -186,7 +208,7 @@ export default function EmployeeScheduleScreen() {
               />
             )}
           </View>
-{/* 
+
           <View style={styles.collapsibleSection}>
             <TouchableOpacity
               onPress={() =>
@@ -195,7 +217,7 @@ export default function EmployeeScheduleScreen() {
               style={styles.collapsibleHeader}
             >
               <Text style={styles.collapsibleTitle}>
-                {t("defaultSchedule")}
+                {t("specificSchedule")}
               </Text>
               <Text>{isSpecificScheduleExpanded ? "▲" : "▼"}</Text>
             </TouchableOpacity>
@@ -209,7 +231,7 @@ export default function EmployeeScheduleScreen() {
                 onSave={handleSaveSpecific}
               />
             )}
-          </View> */}
+          </View>
         </>
       )}
     </ScrollView>

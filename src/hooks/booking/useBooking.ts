@@ -72,11 +72,9 @@ export const useBooking = (services: ServiceDto[]) => {
       const newAvailableTimes: AvailableTime[] = [];
       filteredSchedules.forEach((schedule) => {
         if (schedule.avaiblePeriods && schedule.avaiblePeriods.length > 0) {
-          schedule.avaiblePeriods.forEach((period) => {
             newAvailableTimes.push(
-              ...convertPeriodsToTimeSlots([period], 15, totalServiceTime)
+              ...convertPeriodsToTimeSlots(schedule.avaiblePeriods, 15, totalServiceTime)
             );
-          });
         }
       });
       const uniqueTimes = Array.from(
