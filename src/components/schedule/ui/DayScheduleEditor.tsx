@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AvaiblePeriodDto } from '../../types/schedule';
 import { TimeRangePicker } from './TimeRangePicker';
+import { AvaiblePeriodDto } from '../../../types/schedule';
+import { theme } from '../../../styles/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 interface DayScheduleEditorProps {
   dayName: string;
@@ -44,9 +46,16 @@ export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
         onPress={() => setIsExpanded(!isExpanded)}
       >
         <Text style={styles.dayName}>{dayName}</Text>
-        <Text style={styles.periodCount}>
-          {periods.length} {t('period', { count: periods.length })}
-        </Text>
+        <View style={styles.headerRight}>
+          <Text style={styles.periodCount}>
+            {periods.length} {t('period', { count: periods.length })}
+          </Text>
+          <Ionicons 
+            name={isExpanded ? "chevron-up" : "chevron-down"} 
+            size={20} 
+            color={theme.colors.text.primary} 
+          />
+        </View>
       </TouchableOpacity>
 
       {isExpanded && (
@@ -63,11 +72,13 @@ export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
                 style={styles.removeButton}
                 onPress={() => handleRemovePeriod(index)}
               >
+                <Ionicons name="trash-outline" size={16} color={theme.colors.error} />
                 <Text style={styles.removeButtonText}>{t('remove')}</Text>
               </TouchableOpacity>
             </View>
           ))}
           <TouchableOpacity style={styles.addButton} onPress={handleAddPeriod}>
+            <Ionicons name="add-circle-outline" size={18} color={theme.colors.primary} />
             <Text style={styles.addButtonText}>{t('addPeriod')}</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -78,53 +89,71 @@ export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginVertical: 8,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    marginVertical: theme.spacing.sm,
     overflow: 'hidden',
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f8f8f8',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dayName: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text.primary,
   },
   periodCount: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginRight: theme.spacing.sm,
   },
   content: {
-    padding: 16,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.md,
   },
   periodContainer: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   removeButton: {
-    padding: 8,
-    backgroundColor: '#ffebee',
-    borderRadius: 4,
-    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.sm,
+    marginTop: theme.spacing.sm,
   },
   removeButtonText: {
-    color: '#d32f2f',
+    color: theme.colors.error,
     textAlign: 'center',
     fontWeight: '500',
+    marginLeft: theme.spacing.xs,
   },
   addButton: {
-    padding: 12,
-    backgroundColor: '#e3f2fd',
-    borderRadius: 4,
-    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: theme.borderRadius.sm,
   },
   addButtonText: {
-    color: '#1976d2',
+    color: theme.colors.primary,
     textAlign: 'center',
     fontWeight: '500',
+    marginLeft: theme.spacing.xs,
   },
 });

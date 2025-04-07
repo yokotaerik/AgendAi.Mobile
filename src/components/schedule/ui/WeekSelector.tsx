@@ -1,27 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { DayOfWeek, AvaiblePeriodDto } from '../../../types/schedule';
 import { DayScheduleEditor } from './DayScheduleEditor';
+import { theme } from '../../../styles/theme';
+import { useTranslation } from 'react-i18next';
 
 interface WeekSelectorProps {
   defaultPeriods: Record<DayOfWeek, AvaiblePeriodDto[]>;
   onPeriodsChange: (periods: Record<DayOfWeek, AvaiblePeriodDto[]>) => void;
 }
 
-const DAY_NAMES = {
-  [DayOfWeek.Sunday]: 'Domingo',
-  [DayOfWeek.Monday]: 'Segunda-feira',
-  [DayOfWeek.Tuesday]: 'Terça-feira',
-  [DayOfWeek.Wednesday]: 'Quarta-feira',
-  [DayOfWeek.Thursday]: 'Quinta-feira',
-  [DayOfWeek.Friday]: 'Sexta-feira',
-  [DayOfWeek.Saturday]: 'Sábado',
-};
-
 export const WeekSelector: React.FC<WeekSelectorProps> = ({
   defaultPeriods,
   onPeriodsChange,
 }) => {
+  const { t } = useTranslation();
+  
+  const getDayName = (day: DayOfWeek) => {
+    switch (day) {
+      case DayOfWeek.Sunday: return t('sunday');
+      case DayOfWeek.Monday: return t('monday');
+      case DayOfWeek.Tuesday: return t('tuesday');
+      case DayOfWeek.Wednesday: return t('wednesday');
+      case DayOfWeek.Thursday: return t('thursday');
+      case DayOfWeek.Friday: return t('friday');
+      case DayOfWeek.Saturday: return t('saturday');
+      default: return '';
+    }
+  };
+
   const handleDayPeriodsChange = (day: DayOfWeek, periods: AvaiblePeriodDto[]) => {
     onPeriodsChange({
       ...defaultPeriods,
@@ -31,16 +38,21 @@ export const WeekSelector: React.FC<WeekSelectorProps> = ({
 
   return (
     <ScrollView style={styles.container}>
-      {Object.entries(DAY_NAMES).map(([day, name]) => (
-        <DayScheduleEditor
-          key={day}
-          dayName={name}
-          periods={defaultPeriods[Number(day) as DayOfWeek]}
-          onPeriodsChange={(periods) =>
-            handleDayPeriodsChange(Number(day) as DayOfWeek, periods)
-          }
-        />
-      ))}
+      <View style={styles.weekContainer}>
+        {Object.values(DayOfWeek)
+          .filter(day => !isNaN(Number(day)))
+          .map(day => Number(day) as DayOfWeek)
+          .map(day => (
+            <DayScheduleEditor
+              key={day}
+              dayName={getDayName(day)}
+              periods={defaultPeriods[day]}
+              onPeriodsChange={(periods) =>
+                handleDayPeriodsChange(day, periods)
+              }
+            />
+          ))}
+      </View>
     </ScrollView>
   );
 };
@@ -48,6 +60,9 @@ export const WeekSelector: React.FC<WeekSelectorProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.colors.transparent,
   },
-}); 
+  weekContainer: {
+    padding: theme.spacing.sm,
+  }
+});

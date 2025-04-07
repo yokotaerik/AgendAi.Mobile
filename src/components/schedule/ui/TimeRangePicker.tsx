@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { AvaiblePeriodDto } from '../../types/schedule';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { AvaiblePeriodDto } from '../../../types/schedule';
+import { theme } from '../../../styles/theme';
 
 interface TimeRangePickerProps {
   onTimeRangeChange: (period: AvaiblePeriodDto) => void;
@@ -90,14 +90,14 @@ export const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: '#000',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 2,
   },
   timeContainer: {
     flexDirection: 'row',
@@ -105,19 +105,19 @@ const styles = StyleSheet.create({
   },
   timeButton: {
     flex: 1,
-    padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 6,
-    marginHorizontal: 4,
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.sm,
+    marginHorizontal: theme.spacing.xs,
   },
   label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   timeText: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: '600',
-    color: '#333',
+    color: theme.colors.text.primary,
   },
-}); 
+});

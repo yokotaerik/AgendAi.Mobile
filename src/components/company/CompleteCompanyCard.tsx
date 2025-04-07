@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Image,
   Alert,
-  Button,
   TouchableOpacity,
 } from "react-native";
 import { CompleteCompanyDto, UpdateCompanyDto } from "../../types/company";
@@ -12,6 +11,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useEditCompany } from "../../hooks/company/companyHooks";
 import CustomInput from "../ui/input/CustomInput";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 interface CompleteCompanyCardProps {
   company: CompleteCompanyDto;
@@ -54,25 +55,10 @@ const CompleteCompanyCard: React.FC<CompleteCompanyCardProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}> {t("companyProfile")}</Text>
+      <Text style={styles.sectionTitle}>{t("companyProfile")}</Text>
 
       <View>
-        {/* {[...(company.imageUrls || []), ...newPhotos].map((photo, index) => (
-          <Image
-            key={index}
-            source={
-            //   typeof photo === "string"
-            //     ? { uri: baseURL + photo } :
-            //     null
-            }
-            style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 5 }}
-          />
-        ))} */}
-        {/* <AddPhotoComponent
-          entityId={company.id!}
-          entityType={EntitiesAssociation.Company}
-          onPhotoSelect={(photo) => setNewPhotos([...newPhotos, photo.file])}
-        /> */}
+        {/* Image handling code commented out in original */}
       </View>
 
       <Text style={styles.label}>{t("corporateName")}</Text>
@@ -142,6 +128,7 @@ const CompleteCompanyCard: React.FC<CompleteCompanyCardProps> = ({
         }
       />
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+        <Ionicons name="save-outline" size={20} color={theme.colors.text.primary} />
         <Text style={styles.buttonText}>{t("editEmployee.saveButton")}</Text>
       </TouchableOpacity>
     </View>
@@ -150,49 +137,54 @@ const CompleteCompanyCard: React.FC<CompleteCompanyCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    shadowColor: "#000",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   label: {
-    fontSize: 14,
+    fontSize: theme.typography.fontSize.sm,
     fontWeight: "bold",
-    marginBottom: 4,
-    color: "#333",
+    marginBottom: theme.spacing.xs,
+    color: theme.colors.text.secondary,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
-    fontSize: 16,
-    color: "#333",
+    borderColor: theme.colors.tertiary,
+    borderRadius: theme.borderRadius.sm,
+    padding: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.primary,
+    backgroundColor: theme.colors.background,
   },
   disabledInput: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: `${theme.colors.background}80`,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text.primary,
   },
   button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: theme.colors.primary,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.sm,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: theme.spacing.sm,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "bold",
+    marginLeft: theme.spacing.xs,
   },
 });
 

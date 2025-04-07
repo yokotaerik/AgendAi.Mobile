@@ -18,6 +18,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import api from "../../api";
 import { AttendanceDto } from "../../types/schedule";
 import { router } from "expo-router";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 interface BookingScreenProps {
   services: ServiceDto[];
@@ -54,11 +56,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   
   useEffect(() => {
     if (attendance) {
-
-      console.log(services);
-      
-      console.log(attendance.dateTime)
-
       handleEmployeeSelect(attendance.employee.id);
     }
   }, [attendance]);
@@ -142,7 +139,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={backHandler}>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+        </TouchableOpacity>
         <Text style={styles.title}>{t("makeReservation")}</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content}>
@@ -158,12 +159,25 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             onDayPress={(day: any) => handleDateSelect(day.dateString)}
             onMonthChange={(month: any) => handleDateSelect(month.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: "#007AFF", },
+              [selectedDate]: { selected: true, selectedColor: theme.colors.primary },
             }}
             theme={{
-              selectedDayBackgroundColor: "#007AFF",
-              todayTextColor: "#007AFF",
-              arrowColor: "#007AFF",
+              backgroundColor: theme.colors.background,
+              calendarBackground: theme.colors.background,
+              textSectionTitleColor: theme.colors.text.primary,
+              selectedDayBackgroundColor: theme.colors.primary,
+              selectedDayTextColor: theme.colors.text.primary,
+              todayTextColor: theme.colors.primary,
+              dayTextColor: theme.colors.text.primary,
+              textDisabledColor: theme.colors.text.light,
+              dotColor: theme.colors.primary,
+              selectedDotColor: theme.colors.text.primary,
+              arrowColor: theme.colors.primary,
+              monthTextColor: theme.colors.text.primary,
+              textMonthFontWeight: '600',
+              textDayFontSize: 14,
+              textMonthFontSize: 16,
+              textDayHeaderFontSize: 14
             }}
           />
         </View>
@@ -193,7 +207,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>{t("selectedEmployee")}</Text>
             <Text style={styles.summaryValue}>
-              {employees.find((e) => e.id === selectedEmployee)?.name}
+              {employees.find((e) => e.id === selectedEmployee)?.name || t("anyEmployee")}
             </Text>
           </View>
         </View>
@@ -211,93 +225,101 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    justifyContent: "space-between",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderBottomLeftRadius: theme.borderRadius.lg,
+    borderBottomRightRadius: theme.borderRadius.lg,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerSpacer: {
+    width: 40,
   },
   title: {
-    flex: 1,
-    fontSize: 20,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "bold",
+    color: theme.colors.text.primary,
     textAlign: "center",
-    marginRight: 40,
   },
   content: {
     flex: 1,
   },
   section: {
-    padding: 16,
+    padding: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: theme.colors.surface,
+    backgroundColor: theme.colors.background,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "600",
-    marginBottom: 16,
-    color: "#333",
+    marginBottom: theme.spacing.md,
+    color: theme.colors.text.primary,
   },
   summary: {
-    padding: 16,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
   },
   summaryTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "600",
-    marginBottom: 16,
-    color: "#333",
+    marginBottom: theme.spacing.md,
+    color: theme.colors.text.primary,
   },
   summaryItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: theme.spacing.sm,
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.sm,
   },
   summaryLabel: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.secondary,
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "500",
-    color: "#333",
-  },
-  changeButton: {
-    padding: 8,
-  },
-  changeButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
+    color: theme.colors.text.primary,
   },
   footer: {
-    padding: 16,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-  },
-  addButton: {
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  addButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
-    fontWeight: "500",
+    borderTopColor: theme.colors.surface,
   },
   confirmButton: {
-    padding: 16,
-    backgroundColor: "#007AFF",
-    borderRadius: 8,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.sm,
     alignItems: "center",
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   confirmButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "600",
   },
 });

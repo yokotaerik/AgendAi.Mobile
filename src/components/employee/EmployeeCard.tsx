@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { globalStyles } from "../../styles/global";
 import { baseURL } from "../../api";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { theme } from "../../styles/theme";
 
 type EmployeeCardProps = {
   photoSrc?: string;
@@ -23,7 +23,7 @@ const EmployeeCard = ({
   const { t } = useTranslation();
 
   return (
-    <View style={[styles.card, globalStyles.shadow]}>
+    <View style={styles.card}>
       <View style={styles.contentContainer}>
         <View style={styles.infoContainer}>
           <Image
@@ -39,15 +39,15 @@ const EmployeeCard = ({
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={onEdit}>
-            <Ionicons name="create-outline" size={20} color="#555" />
+            <Ionicons name="create-outline" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={onSee}>
-            <Ionicons name="search-outline" size={20} color="#555" />
+            <Ionicons name="eye-outline" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={onSchedule}>
-            <Ionicons name="calendar-clear-outline" size={20} color="#555" />
+            <Ionicons name="calendar-outline" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -57,53 +57,51 @@ const EmployeeCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginVertical: 2,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.xs,
     width: "100%",
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    elevation: 2,
   },
   contentContainer: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   infoContainer: {
     flex: 1,
-    gap: 8,
-    flexDirection: "column",
+    flexDirection: "row",
+    alignItems: "center",
   },
   photo: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
+    backgroundColor: theme.colors.secondary,
   },
   name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    flex: 1,
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
   },
   buttonContainer: {
-    flexDirection: "column",
-    gap: 8,
+    flexDirection: "row",
+    gap: theme.spacing.xs,
   },
   button: {
-    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    padding: 2,
-    marginLeft: 8,
-    width: 60,
-  },
-  buttonText: {
-    fontSize: 10,
-    color: "#555",
-    marginTop: 4,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: theme.borderRadius.sm,
+    padding: theme.spacing.xs,
+    width: 36,
+    height: 36,
   },
 });
 

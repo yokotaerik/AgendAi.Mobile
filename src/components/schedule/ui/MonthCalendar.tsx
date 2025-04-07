@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import * as Localization from 'expo-localization';
+import { theme } from '../../../styles/theme';
 
 interface MonthCalendarProps {
   onDaySelect: (date: string) => void;
@@ -22,16 +23,23 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         onDayPress={handleDayPress}
         markedDates={markedDates}
         theme={{
-          calendarBackground: '#ffffff',
-          textSectionTitleColor: '#666666',
-          selectedDayBackgroundColor: '#1976d2',
-          selectedDayTextColor: '#ffffff',
-          todayTextColor: '#1976d2',
-          dayTextColor: '#333333',
-          textDisabledColor: '#d9d9d9',
-          dotColor: '#1976d2',
-          monthTextColor: '#333333',
-          arrowColor: '#1976d2',
+          calendarBackground: theme.colors.surface,
+          textSectionTitleColor: theme.colors.text.secondary,
+          selectedDayBackgroundColor: theme.colors.primary,
+          selectedDayTextColor: theme.colors.text.primary,
+          todayTextColor: theme.colors.primary,
+          dayTextColor: theme.colors.text.primary,
+          textDisabledColor: `${theme.colors.text.light}80`,
+          dotColor: theme.colors.primary,
+          monthTextColor: theme.colors.text.primary,
+          arrowColor: theme.colors.primary,
+          // Additional styling
+          textDayFontSize: theme.typography.fontSize.sm,
+          textMonthFontSize: theme.typography.fontSize.md,
+          textDayHeaderFontSize: theme.typography.fontSize.sm,
+          textDayFontWeight: '400',
+          textMonthFontWeight: 'bold',
+          textDayHeaderFontWeight: '600',
         }}
         locale={osLocale}
         firstDay={1}
@@ -45,14 +53,14 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginVertical: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    marginVertical: theme.spacing.sm,
     overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
+    elevation: 3,
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-}); 
+});

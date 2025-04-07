@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { theme } from "../../styles/theme";
 
 interface Employee {
   id: string;
@@ -46,7 +47,14 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
           style={styles.employeePhoto}
         />
       </View>
-      <Text style={styles.employeeName} numberOfLines={2} ellipsizeMode="tail">
+      <Text 
+        style={[
+          styles.employeeName,
+          selectedEmployee === item.id && styles.selectedEmployeeText
+        ]} 
+        numberOfLines={2} 
+        ellipsizeMode="tail"
+      >
         {item.name}
       </Text>
     </TouchableOpacity>
@@ -69,27 +77,29 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    padding: 16,
+    padding: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: theme.colors.surface,
+    backgroundColor: theme.colors.background,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "600",
-    marginBottom: 16,
-    color: "#333",
+    marginBottom: theme.spacing.md,
+    color: theme.colors.text.primary,
   },
   employeeList: {
-    marginHorizontal: -16,
-    paddingHorizontal: 16,
+    marginHorizontal: -theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
   },
   employeeContainer: {
-    marginRight: 20,
+    marginRight: theme.spacing.lg,
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
-    borderRadius: 12,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
     width: 100,
+    backgroundColor: theme.colors.surface,
   },
   employeeItem: {
     alignItems: "center",
@@ -99,20 +109,25 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.tertiary,
   },
   employeeName: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
     textAlign: "center",
     maxWidth: 80,
     overflow: "hidden",
   },
   selectedEmployee: {
     borderWidth: 2,
-    borderColor: "#007AFF",
-    backgroundColor: "rgba(0, 122, 255, 0.1)",
+    borderColor: theme.colors.primary,
+    backgroundColor: `${theme.colors.primary}20`,
   },
+  selectedEmployeeText: {
+    color: theme.colors.text.primary,
+    fontWeight: "500",
+  }
 });
 
 export default EmployeeList;

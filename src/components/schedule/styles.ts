@@ -1,45 +1,54 @@
 import { StyleSheet } from "react-native";
-import { globalStyles } from "../../styles/global";
+import { theme } from "../../styles/theme";
 
 const stylesSchedulePage = StyleSheet.create({
   container: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: theme.colors.surface,
   },
   header: {
-    padding: 16,
-    backgroundColor: "#fff",
-    ...globalStyles.shadow,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    shadowOpacity: 0.2,
+    elevation: 4,
   },
   summaryButton: {
-    padding: 8,
-    backgroundColor: "#e3f2fd",
-    borderRadius: 4,
+    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: theme.borderRadius.sm,
   },
   summaryButtonText: {
-    color: "#1976d2",
+    color: theme.colors.primary,
     fontWeight: "500",
   },
   saveButton: {
-    margin: 16,
+    margin: theme.spacing.md,
   },
   collapsibleSection: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 16,
-    ...globalStyles.shadow,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.md,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    shadowOpacity: 0.2,
+    elevation: 3,
   },
   collapsibleHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 16,
-    backgroundColor: "#f8f8f8",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: theme.borderRadius.md,
+    borderTopRightRadius: theme.borderRadius.md,
   },
   collapsibleTitle: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "600",
-    color: "#333",
+    color: theme.colors.text.primary,
   },
-  
 });
 
 export default stylesSchedulePage;

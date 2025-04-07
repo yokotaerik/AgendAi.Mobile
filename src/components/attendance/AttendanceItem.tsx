@@ -5,6 +5,9 @@ import { ptBR } from "date-fns/locale";
 import { AttendanceSummary } from "../../hooks/attendance/useAttendances";
 import { ServiceDto } from "../../types/service";
 import { router } from "expo-router";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 interface AttendanceItemProps {
   attendanceSummary: AttendanceSummary;
@@ -15,23 +18,22 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   attendanceSummary,
   isEmployeeView,
 }) => {
+  const { t } = useTranslation();
   const { attendance, totalPrice, totalDuration } = attendanceSummary;
   const participant = isEmployeeView
     ? attendance.costumer
     : attendance.employee;
 
-  
-
   return (
     <TouchableOpacity style={styles.container}>
       <View style={styles.header}>
-        <View style={{flexDirection: 'row', flex: 1}}>
+        <View style={styles.participantContainer}>
           <Image 
-          source={
-            participant.imageUrl
-              ? { uri: participant.imageUrl }
-              : require("../../../assets/default-avatar.png")
-          }
+            source={
+              participant.imageUrl
+                ? { uri: participant.imageUrl }
+                : require("../../../assets/default-avatar.png")
+            }
             resizeMode="cover"
             accessibilityLabel="Avatar"
             style={styles.avatar} 
@@ -42,52 +44,56 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
             </Text>
             <Text style={styles.date}>
               {format(
-          new Date(attendance.dateTime),
-          "dd 'de' MMMM 'às' HH:mm",
-          {
-            locale: ptBR,
-          }
+                new Date(attendance.dateTime),
+                "dd 'de' MMMM 'às' HH:mm",
+                {
+                  locale: ptBR,
+                }
               )}
             </Text>
           </View>
         </View>
-        <View>
-          {/* Edit and cancel button */}
+        <View style={styles.actionsContainer}>
           <TouchableOpacity
             onPress={() => {
               router.push("/attendance/edit/" + attendance.id);
             }}
-            style={{ marginBottom: 8 }}
+            style={styles.editButton}
           >
-            <Text style={{ color: "#007BFF" }}>Editar</Text>
+            <Ionicons name="create-outline" size={16} color={theme.colors.primary} />
+            <Text style={styles.editButtonText}>{t("edit")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               // Handle cancel action
             }}
-            style={{ marginBottom: 8 }}
+            style={styles.cancelButton}
           >
-            <Text style={{ color: "#FF0000" }}>Cancelar</Text>
+            <Ionicons name="close-circle-outline" size={16} color={theme.colors.error} />
+            <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.servicesContainer}>
-        <Text style={styles.servicesTitle}>Serviços:</Text>
+        <Text style={styles.servicesTitle}>{t("services")}:</Text>
         {attendance.services.map((service: ServiceDto, index: number) => (
-          <Text key={index} style={styles.serviceItem}>
-            • {service.name}
-          </Text>
+          <View key={index} style={styles.serviceItemContainer}>
+            <Ionicons name="checkmark-circle" size={16} color={theme.colors.primary} />
+            <Text style={styles.serviceItem}>
+              {service.name}
+            </Text>
+          </View>
         ))}
       </View>
 
       <View style={styles.footer}>
         <View style={styles.infoContainer}>
-          <Text style={styles.infoLabel}>Duração Total:</Text>
+          <Text style={styles.infoLabel}>{t("totalDuration")}:</Text>
           <Text style={styles.infoValue}>{totalDuration}</Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.infoLabel}>Valor Total:</Text>
+          <Text style={styles.infoLabel}>{t("totalPrice")}:</Text>
           <Text style={styles.infoValue}>R$ {totalPrice.toFixed(2)}</Text>
         </View>
       </View>
@@ -97,11 +103,11 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -113,61 +119,99 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    justifyContent: "space-between",
+    marginBottom: theme.spacing.md,
+  },
+  participantContainer: {
+    flexDirection: "row",
+    flex: 1,
   },
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
+    backgroundColor: theme.colors.tertiary,
   },
   participantInfo: {
     flex: 1,
+    justifyContent: "center",
   },
   participantName: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "600",
-    color: "#333",
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
   },
   date: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+  },
+  actionsContainer: {
+    alignItems: "flex-end",
+  },
+  editButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.sm,
+  },
+  editButtonText: {
+    color: theme.colors.primary,
+    marginLeft: theme.spacing.xs,
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: "500",
+  },
+  cancelButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    color: theme.colors.error,
+    marginLeft: theme.spacing.xs,
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: "500",
   },
   servicesContainer: {
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
+    backgroundColor: `${theme.colors.background}80`,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
   },
   servicesTitle: {
-    fontSize: 14,
+    fontSize: theme.typography.fontSize.sm,
     fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.sm,
+  },
+  serviceItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.xs,
   },
   serviceItem: {
-    fontSize: 14,
-    color: "#666",
-    marginLeft: 8,
-    marginBottom: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.xs,
   },
   footer: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-    paddingTop: 12,
+    borderTopColor: `${theme.colors.text.light}20`,
+    paddingTop: theme.spacing.md,
   },
   infoContainer: {
     flex: 1,
   },
   infoLabel: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   infoValue: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "600",
-    color: "#333",
+    color: theme.colors.text.primary,
   },
 });
 

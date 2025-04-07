@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Platform,
-  SafeAreaView,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useAttendances } from "../../hooks/attendance/useAttendances";
@@ -17,8 +16,10 @@ import { UserType } from "../../types/common";
 import { useGetEmployee } from "../../hooks/employee/employeeHook";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useIsFocused } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 
-// Create a props to send id
 interface AttendanceScreenProps {
   id: string;
 }
@@ -69,8 +70,6 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
         id != "customer" ? UserType.Employee : UserType.Customer
       );
     }
-
-    console.log(attendances, "attendances");
   }, [id, idToGet, startDate, endDate, customerId, isFocused]);
 
   const formatDate = (dateString: any) => {
@@ -81,7 +80,7 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -89,6 +88,7 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
+        <Ionicons name="alert-circle-outline" size={48} color={theme.colors.error} />
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
@@ -101,8 +101,9 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
       </View>
 
       {employee && (
-        <View style={styles.header}>
-          <Text style={styles.title}>{employee.name}</Text>
+        <View style={styles.employeeHeader}>
+          <Ionicons name="person" size={24} color={theme.colors.primary} />
+          <Text style={styles.employeeName}>{employee.name}</Text>
         </View>
       )}
 
@@ -113,7 +114,8 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
             style={styles.dateButton}
             onPress={() => setShowStartDatePicker(true)}
           >
-            <Text>{formatDate(startDate)}</Text>
+            <Ionicons name="calendar-outline" size={16} color={theme.colors.text.secondary} style={styles.dateIcon} />
+            <Text style={styles.dateText}>{formatDate(startDate)}</Text>
           </TouchableOpacity>
           {showStartDatePicker && (
             <DateTimePicker
@@ -131,7 +133,8 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
             style={styles.dateButton}
             onPress={() => setShowEndDatePicker(true)}
           >
-            <Text>{formatDate(endDate)}</Text>
+            <Ionicons name="calendar-outline" size={16} color={theme.colors.text.secondary} style={styles.dateIcon} />
+            <Text style={styles.dateText}>{formatDate(endDate)}</Text>
           </TouchableOpacity>
           {showEndDatePicker && (
             <DateTimePicker
@@ -144,15 +147,22 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
         </View>
       </View>
 
-      <FlatList
-        data={attendances}
-        renderItem={({ item }) => (
-          <AttendanceItem attendanceSummary={item} isEmployeeView={false} />
-        )}
-        keyExtractor={(item) => item.attendance.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {attendances.length > 0 ? (
+        <FlatList
+          data={attendances}
+          renderItem={({ item }) => (
+            <AttendanceItem attendanceSummary={item} isEmployeeView={false} />
+          )}
+          keyExtractor={(item) => item.attendance.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="calendar" size={60} color={theme.colors.text.light} />
+          <Text style={styles.emptyText}>{t("noAttendances")}</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -160,64 +170,110 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    marginTop: 30,
+    backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    padding: theme.spacing.md,
+    paddingTop: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 4,
+    marginBottom: theme.spacing.md,
   },
   title: {
-    fontSize: 20,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: "bold",
-    color: "#333",
+    color: theme.colors.text.primary,
+  },
+  employeeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    marginHorizontal: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.md,
+  },
+  employeeName: {
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+    marginLeft: theme.spacing.sm,
   },
   dateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    marginHorizontal: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.md,
   },
   datePickerWrapper: {
     flex: 1,
     alignItems: "center",
   },
   dateLabel: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
+    fontWeight: "500",
   },
   dateButton: {
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    backgroundColor: "#f9f9f9",
-    minWidth: 100,
+    flexDirection: "row",
     alignItems: "center",
+    padding: theme.spacing.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.tertiary,
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.background,
+    minWidth: 120,
+    justifyContent: "center",
+  },
+  dateIcon: {
+    marginRight: theme.spacing.xs,
+  },
+  dateText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.primary,
   },
   listContent: {
-    padding: 16,
+    padding: theme.spacing.md,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: theme.colors.background,
   },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background,
   },
   errorText: {
-    fontSize: 16,
-    color: "#ff3b30",
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.error,
     textAlign: "center",
+    marginTop: theme.spacing.md,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: theme.spacing.lg,
+  },
+  emptyText: {
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.secondary,
+    textAlign: "center",
+    marginTop: theme.spacing.md,
   },
 });
 

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AvailableTime } from "../../types/schedule";
+import { theme } from "../../styles/theme";
 
 interface TimeListProps {
   availableTimes: AvailableTime[];
@@ -61,42 +62,45 @@ const TimeList: React.FC<TimeListProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    padding: 16,
+    padding: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: theme.colors.surface,
+    backgroundColor: theme.colors.background,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "600",
-    marginBottom: 16,
-    color: "#333",
+    marginBottom: theme.spacing.md,
+    color: theme.colors.text.primary,
   },
   timeList: {
-    padding: 8,
+    padding: theme.spacing.sm,
   },
   timeButton: {
     flex: 1,
-    padding: 12,
-    margin: 4,
-    borderRadius: 8,
-    backgroundColor: "#f5f5f5",
+    padding: theme.spacing.md,
+    margin: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.surface,
     alignItems: "center",
+    minWidth: 80,
   },
   timeText: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.primary,
   },
   unavailableTime: {
-    backgroundColor: "#eee",
+    backgroundColor: `${theme.colors.surface}80`,
   },
   unavailableTimeText: {
-    color: "#999",
+    color: theme.colors.text.light,
   },
   selectedTime: {
-    backgroundColor: "#007AFF",
+    backgroundColor: theme.colors.primary,
   },
   selectedTimeText: {
-    color: "#fff",
+    color: theme.colors.text.primary,
+    fontWeight: "600",
   },
 });
 

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { CompanyDto } from "../../types/company";
+import { theme } from "../../styles/theme";
 
 interface CompanyCardProps {
   company: CompanyDto;
@@ -31,11 +32,11 @@ export function CompanyCard({ company }: CompanyCardProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 8,
-    shadowColor: "#000",
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.sm,
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -43,29 +44,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    
   },
   image: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginRight: 16,
+    marginRight: theme.spacing.md,
+    backgroundColor: theme.colors.tertiary,
   },
   info: {
     flex: 1,
   },
   fantasyName: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    color: theme.colors.text.primary,
   },
   corporateName: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   address: {
-    fontSize: 12,
-    color: "#999",
+    fontSize: theme.typography.fontSize.xs,
+    color: theme.colors.text.light,
   },
 });

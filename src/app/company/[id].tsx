@@ -1,5 +1,5 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { Text, StyleSheet, View, Image, TouchableOpacity, ScrollView } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCompany } from "../../hooks/company/companyHooks";
@@ -9,6 +9,8 @@ import ServiceTabs from "../../components/company/tabs/ServiceTabs";
 import EmployeeTab from "../../components/company/tabs/EmployeeTab";
 import { ServiceDto } from "../../types/service";
 import BookingScreen from "../../components/booking/BookingScreen";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CompanyDetails() {
   const { t } = useTranslation();
@@ -39,7 +41,7 @@ export default function CompanyDetails() {
   if (loading) {
     return (
       <View style={styles.errorContainer}>
-        <Text>{t("loading")}</Text>
+        <Text style={styles.loadingText}>{t("loading")}</Text>
       </View>
     );
   }
@@ -47,7 +49,7 @@ export default function CompanyDetails() {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text>{t("error.loadCompany")}</Text>
+        <Text style={styles.errorText}>{t("error.loadCompany")}</Text>
       </View>
     );
   }
@@ -66,28 +68,25 @@ export default function CompanyDetails() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {companyId == null ? (
-        <TouchableOpacity
-          style={styles.sendMessageButton}
-          onPress={() => goTochat()}
-        >
-          <Text> Enviar mensagem </Text>
-        </TouchableOpacity>
-      ) : null}
-      <View>
-        <Image
-          source={{ uri: company?.imageUrls?.[0] }}
-          style={styles.companyImage}
-        />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.headerContainer}>
+          <Image
+            source={{ 
+              uri: company?.imageUrls?.[0] || 'https://via.placeholder.com/400x200?text=No+Image' 
+            }}
+            style={styles.companyImage}
+          />
+        </View>
 
         <View style={styles.infoContainer}>
           <Text style={styles.companyName}>{company?.fantasyName}</Text>
           <Text style={styles.corporateName}>{company?.corporateName}</Text>
 
           <View style={styles.addressContainer}>
+            <Ionicons name="location-outline" size={16} color={theme.colors.text.secondary} />
             <Text style={styles.addressText}>
               {company?.address?.street}, {company?.address?.number}
-              {company?.address?.neighborhood} - {company?.address?.city}/
+              {company?.address?.neighborhood && `, ${company?.address?.neighborhood}`} - {company?.address?.city}/
               {company?.address?.state}
             </Text>
           </View>
@@ -100,6 +99,11 @@ export default function CompanyDetails() {
               ]}
               onPress={() => setActiveTab("services")}
             >
+              <Ionicons 
+                name="list-outline" 
+                size={18} 
+                color={activeTab === "services" ? theme.colors.text.primary : theme.colors.text.secondary} 
+              />
               <Text
                 style={[
                   styles.tabText,
@@ -116,6 +120,11 @@ export default function CompanyDetails() {
               ]}
               onPress={() => setActiveTab("professionals")}
             >
+              <Ionicons 
+                name="people-outline" 
+                size={18} 
+                color={activeTab === "professionals" ? theme.colors.text.primary : theme.colors.text.secondary} 
+              />
               <Text
                 style={[
                   styles.tabText,
@@ -126,7 +135,8 @@ export default function CompanyDetails() {
               </Text>
             </TouchableOpacity>
           </View>
-          <View>
+          
+          <View style={styles.tabContent}>
             {activeTab === "services" ? (
               <ServiceTabs
                 onServiceSelect={(services) => {
@@ -139,97 +149,132 @@ export default function CompanyDetails() {
             ) : null}
           </View>
         </View>
-      </View>
+      </ScrollView>
+
+      {companyId == null && (
+        <TouchableOpacity
+          style={styles.sendMessageButton}
+          onPress={goTochat}
+        >
+          <Ionicons name="chatbubble-outline" size={18} color={theme.colors.text.primary} />
+          <Text style={styles.sendMessageText}>{t("sendMessage")}</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  emptyText: {
-    textAlign: "center",
-    color: "#666",
-    marginTop: 20,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-  flatListContent: {
-    gap: 10,
+  scrollContent: {
+    flexGrow: 1,
+  },
+  headerContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: theme.colors.surface,
+  },
+  companyImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: 'cover',
+  },
+  infoContainer: {
+    padding: theme.spacing.md,
+  },
+  companyName: {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: "bold",
+    marginBottom: theme.spacing.xs,
+    color: theme.colors.text.primary,
+  },
+  corporateName: {
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.md,
+  },
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
+  },
+  addressText: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.xs,
+    flex: 1,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.xs,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.borderRadius.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTabButton: {
+    backgroundColor: theme.colors.primary,
+  },
+  tabText: {
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.xs,
+  },
+  activeTabText: {
+    color: theme.colors.text.primary,
+    fontWeight: '600',
+  },
+  tabContent: {
+    flex: 1,
   },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: theme.colors.background,
   },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
+  loadingText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.lg,
   },
-  companyImage: {
-    width: "100%",
-    height: 200,
-  },
-  infoContainer: {
-    padding: 20,
-  },
-  companyName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  corporateName: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 15,
-  },
-  addressContainer: {
-    marginBottom: 20,
-  },
-  addressText: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 2,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  servicesContainer: {
-    gap: 10,
+  errorText: {
+    color: theme.colors.error,
+    fontSize: theme.typography.fontSize.lg,
   },
   sendMessageButton: {
     position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "#0099ff",
-    padding: 10,
+    bottom: theme.spacing.lg,
+    right: theme.spacing.lg,
+    backgroundColor: theme.colors.primary,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.full,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
     zIndex: 10,
-    width: 140,
-    height: 40,
-    borderRadius: 5,
   },
-  employeesContainer: {
-    flexDirection: "row",
-    gap: 15,
-  },
-  tabContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    backgroundColor: "#f0f0f0",
-  },
-  activeTabButton: {
-    backgroundColor: "#0099ff",
-  },
-  tabText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  activeTabText: {
-    color: "#fff",
+  sendMessageText: {
+    color: theme.colors.text.primary,
+    fontWeight: '600',
+    marginLeft: theme.spacing.xs,
   },
 });

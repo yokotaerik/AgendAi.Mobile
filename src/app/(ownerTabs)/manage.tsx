@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   RefreshControl,
   ScrollView,
 } from "react-native";
@@ -16,6 +15,8 @@ import { useEffect, useState } from "react";
 import ServiceCard from "../../components/service/ServiceCard";
 import { useGetCompany } from "../../hooks/company/companyHooks";
 import CompleteCompanyCard from "../../components/company/CompleteCompanyCard";
+import { Ionicons } from "@expo/vector-icons";
+import { theme } from "../../styles/theme";
 
 export default function ManageCompany() {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function ManageCompany() {
   const { services, error: serviceError, fetchServices } = useListServices();
 
   const [refreshing, setRefreshing] = useState(false);
+  const [activeSection, setActiveSection] = useState("services");
 
   useEffect(() => {
     if (companyId != null) {
@@ -45,61 +47,107 @@ export default function ManageCompany() {
     }
   };
 
+  const renderManagementCard = (
+    title: string,
+    icon: string,
+    onPress: () => void,
+    count?: number
+  ) => (
+    <TouchableOpacity style={styles.managementCard} onPress={onPress}>
+      <View style={styles.managementIconContainer}>
+        <Ionicons name={icon as any} size={28} color={theme.colors.primary} />
+      </View>
+      <View style={styles.managementTextContainer}>
+        <Text style={styles.managementTitle}>{title}</Text>
+        {count !== undefined && (
+          <Text style={styles.managementCount}>{count} items</Text>
+        )}
+      </View>
+      <Ionicons name="chevron-forward" size={20} color={theme.colors.text.light} />
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
         }
+        showsVerticalScrollIndicator={false}
       >
+        <View style={styles.header}>
+          <Text style={styles.title}>{t("manageCompany")}</Text>
+          <Text style={styles.subtitle}>{company?.fantasyName || ""}</Text>
+        </View>
+
         <View style={styles.content}>
-          <Text style={styles.title}>Gerenciar Empresa</Text>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/manage/service/add")}
-            >
-              <Text style={styles.buttonText}>Adicionar Servico</Text>
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t("quickActions")}</Text>
+            <View style={styles.quickActionsContainer}>
+              <TouchableOpacity 
+                style={styles.quickActionButton}
+                onPress={() => router.push("/manage/service/add")}
+              >
+                <View style={styles.quickActionIconContainer}>
+                  <Ionicons name="add-circle-outline" size={24} color={theme.colors.primary} />
+                </View>
+                <Text style={styles.quickActionText}>{t("addService")}</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.quickActionButton}
+                onPress={() => router.push("/manage/employee/add")}
+              >
+                <View style={styles.quickActionIconContainer}>
+                  <Ionicons name="person-add-outline" size={24} color={theme.colors.primary} />
+                </View>
+                <Text style={styles.quickActionText}>{t("addEmployee")}</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.quickActionButton}
+                onPress={() => router.push("/manage/schedule")}
+              >
+                <View style={styles.quickActionIconContainer}>
+                  <Ionicons name="calendar-outline" size={24} color={theme.colors.primary} />
+                </View>
+                <Text style={styles.quickActionText}>{t("schedule")}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Serviços</Text>
-            {services && services.length > 0 ? (
-              <FlatList
-                scrollEnabled={true}
-                horizontal={true}
-                data={services}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.flatListContent}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() =>
-                      router.push(`/manage/service/edit/${item.id}`)
-                    }
-                  >
-                    <ServiceCard service={item} />
-                  </TouchableOpacity>
-                )}
-                ListEmptyComponent={() => (
-                  <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
-                )}
-              />
-            ) : (
-              <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
+            <Text style={styles.sectionTitle}>{t("management")}</Text>
+            
+            {renderManagementCard(
+              t("manageServices"), 
+              "cut-outline", 
+              () => router.push("/manage/service"),
+              services?.length
             )}
-          </View>
-
-          <View style={styles.section}>
-            <TouchableOpacity onPress={() => router.push("/manage/employee")}>
-              <Text> {t("manageEmployee")}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.section}>
-            {company != null ? <CompleteCompanyCard company={company} /> : null}
+            
+            {renderManagementCard(
+              t("manageEmployees"), 
+              "people-outline", 
+              () => router.push("/manage/employee")
+            )}
+            
+            {renderManagementCard(
+              t("manageSchedule"), 
+              "time-outline", 
+              () => router.push("/manage/schedule")
+            )}
+            
+            {renderManagementCard(
+              t("manageCompanyProfile"), 
+              "business-outline", 
+              () => router.push("/manage/company/edit")
+            )}
           </View>
         </View>
       </ScrollView>
@@ -110,65 +158,149 @@ export default function ManageCompany() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
-  content: {
-    flex: 1,
+  header: {
     padding: 20,
+    paddingTop: 10,
+    backgroundColor: theme.colors.surface,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 4,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
+    color: theme.colors.text.primary,
+    marginBottom: 4,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    flex: 0.48,
-  },
-  buttonText: {
-    color: "#fff",
-    textAlign: "center",
+  subtitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: theme.colors.text.secondary,
+  },
+  content: {
+    padding: 20,
   },
   section: {
-    marginTop: 20,
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+    marginBottom: 16,
   },
-  listItem: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-    borderRadius: 8,
-    marginRight: 10, // Adicionado gap entre os itens
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  itemDetail: {
+  seeAllText: {
     fontSize: 14,
-    color: "#666",
-    marginTop: 5,
+    color: theme.colors.primary,
+    fontWeight: "500",
   },
-  emptyText: {
+  quickActionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  quickActionButton: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 6,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  quickActionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.colors.primary + "20",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  quickActionText: {
+    fontSize: 12,
+    color: theme.colors.text.primary,
     textAlign: "center",
-    color: "#666",
-    marginTop: 20,
+  },
+  managementCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  managementIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.colors.primary + "20",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  managementTextContainer: {
+    flex: 1,
+  },
+  managementTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: theme.colors.text.primary,
+  },
+  managementCount: {
+    fontSize: 14,
+    color: theme.colors.text.light,
+  },
+  serviceCard: {
+    width: 200,
+    marginRight: 12,
   },
   flatListContent: {
-    gap: 10,
+    paddingRight: 20,
+  },
+  emptyContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: theme.colors.text.light,
+    textAlign: "center",
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  emptyButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  emptyButtonText: {
+    color: theme.colors.surface,
+    fontWeight: "500",
   },
 });
