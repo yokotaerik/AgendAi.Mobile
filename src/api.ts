@@ -1,10 +1,10 @@
 import axios from "axios";
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import Toast from "react-native-toast-message";
 
 export const baseURL =
   Platform.OS == "android"
-    ? "http://192.168.250.172:5000/api"
+    ? "http://192.168.15.6:5000/api"
     : "http://localhost:5000/api";
 
 const api = axios.create({
@@ -20,6 +20,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.log(error);
     let errorMessage = "An error occurred.";
     if (error.response) {
       switch (error.response.status) {
@@ -27,17 +28,14 @@ api.interceptors.response.use(
           errorMessage = "Erro tratado";
           break;
         default:
+          console.log(error.response);
+          
           errorMessage = "An unexpected error occurred.";
           break;
       }
 
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: errorMessage,
-        position: "bottom",
-      });
 
+      Alert.alert("Error", errorMessage);
       return Promise.reject({ ...error });
     }
   }

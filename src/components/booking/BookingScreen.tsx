@@ -10,7 +10,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { ServiceDto } from "../../types/service";
 import { Calendar } from "react-native-calendars";
-import { ptBR } from "date-fns/locale";
 import EmployeeList from "./EmployeeList";
 import TimeList from "./TimeList";
 import { useBooking } from "../../hooks/booking/useBooking";
@@ -20,15 +19,18 @@ import { AttendanceDto } from "../../types/schedule";
 import { router } from "expo-router";
 import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { use } from "i18next";
+import { UserType } from "../../types/common";
 
 interface BookingScreenProps {
   services: ServiceDto[];
-  attendance: AttendanceDto | null
+  customerId?: string;
+  attendance: AttendanceDto | null;
   backHandler: () => void;
 }
 
 interface BookingData {
-  id? : string;
+  id?: string;
   serviceIds: string[];
   customerId?: string;
   employeeId?: string;
@@ -39,9 +41,10 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   services,
   backHandler,
   attendance = null,
+  customerId = undefined,
 }) => {
   const { t } = useTranslation();
-  const { customerId } = useAuth();
+  const { customerId: contextCustomerId, user } = useAuth();
   const {
     selectedDate,
     selectedTime,
@@ -53,7 +56,13 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     handleEmployeeSelect,
     handleServiceSelect,
   } = useBooking(services);
-  
+
+  useEffect(() => {
+    if (customerId == undefined && contextCustomerId != null) {
+      customerId = contextCustomerId;
+    }
+  }, []);
+
   useEffect(() => {
     if (attendance) {
       handleEmployeeSelect(attendance.employee.id);
@@ -65,15 +74,18 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   }, [services]);
 
   useEffect(() => {
-    const backHandlerSubscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      backHandler();
-      return true; // Indicates that we've handled the back button press
-    });
+    const backHandlerSubscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        backHandler();
+        return true; // Indicates that we've handled the back button press
+      }
+    );
 
     // Clean up the event listener when component unmounts
     return () => backHandlerSubscription.remove();
   }, [backHandler]);
-  
+
   const handleConfirm = async () => {
     if (
       !selectedDate ||
@@ -87,8 +99,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       return;
     }
 
+    if(attendance)
+      customerId = attendance.costumer.id;
+
     if (!customerId) {
-      console.error("Customer ID is not available.");
+      console.error("Customer ID is not available.", customerId);
       return;
     }
 
@@ -103,13 +118,14 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
 
     let bookingData: BookingData;
 
-    if(attendance == undefined) {
-       bookingData = {
-      serviceIds: services.map((service) => service.id),
-      employeeId: selectedEmployee,
-      customerId,
-      appointment: selectedDateTime.toISOString(),
-    }; }else {
+    if (attendance == undefined) {
+      bookingData = {
+        serviceIds: services.map((service) => service.id),
+        employeeId: selectedEmployee,
+        customerId,
+        appointment: selectedDateTime.toISOString(),
+      };
+    } else {
       bookingData = {
         id: attendance.id,
         serviceIds: services.map((service) => service.id),
@@ -122,14 +138,16 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       let response;
 
       if (attendance == undefined) {
-          response = await api.post("/attendance", bookingData);
-      }
-      else {
+        response = await api.post("/attendance", bookingData);
+      } else {
         response = await api.put("/attendance", bookingData);
       }
 
-      if(response.status === 200) {
-          router.push("/tabs/attendances")
+      if (response.status === 200) {
+        if(user?.role == UserType.Customer)
+          router.push("/(tabs)/attendances");
+      } else {
+         backHandler(); 
       }
     } catch {
       return;
@@ -140,7 +158,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={backHandler}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.text.primary}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>{t("makeReservation")}</Text>
         <View style={styles.headerSpacer} />
@@ -159,7 +181,10 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             onDayPress={(day: any) => handleDateSelect(day.dateString)}
             onMonthChange={(month: any) => handleDateSelect(month.dateString)}
             markedDates={{
-              [selectedDate]: { selected: true, selectedColor: theme.colors.primary },
+              [selectedDate]: {
+                selected: true,
+                selectedColor: theme.colors.primary,
+              },
             }}
             theme={{
               backgroundColor: theme.colors.background,
@@ -174,10 +199,10 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
               selectedDotColor: theme.colors.text.primary,
               arrowColor: theme.colors.primary,
               monthTextColor: theme.colors.text.primary,
-              textMonthFontWeight: '600',
+              textMonthFontWeight: "600",
               textDayFontSize: 14,
               textMonthFontSize: 16,
-              textDayHeaderFontSize: 14
+              textDayHeaderFontSize: 14,
             }}
           />
         </View>
@@ -207,7 +232,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>{t("selectedEmployee")}</Text>
             <Text style={styles.summaryValue}>
-              {employees.find((e) => e.id === selectedEmployee)?.name || t("anyEmployee")}
+              {employees.find((e) => e.id === selectedEmployee)?.completeName ||
+                t("anyEmployee")}
             </Text>
           </View>
         </View>

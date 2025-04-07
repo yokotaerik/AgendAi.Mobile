@@ -11,7 +11,7 @@ interface AuthContextData {
   signed: boolean;
   user: UserInfo | null;
   owner: CompanyOwnerDto | null;
-  companyId: string | null;
+  companyId: string | undefined;
   customerId: string | null;
   signIn(data: LoginDto): Promise<boolean>;
   signOut(): void;
@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const { t } = useTranslation();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [owner, setOwner] = useState<CompanyOwnerDto | null>(null);
-  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<string | undefined>(undefined);
   const [signed, setSigned] = useState<boolean>(false);
   const [customerId, setCustomerId] = useState<string | null>(null);
 
@@ -71,8 +71,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       return true;
     } catch (error) {
-      console.error("Failed to sign in:", error);
-      Alert.alert(t("login.error"));
       return false;
     }
   }
@@ -80,7 +78,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   function signOut() {
     setUser(null);
     setOwner(null);
-    setCompanyId(null);
+    setCompanyId(undefined);
     setSigned(false);
     setCustomerId(null);
     api.defaults.headers.common["Authorization"] = "";

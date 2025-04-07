@@ -4,12 +4,7 @@ import { AvailableTime, ScheduleDto } from "../../types/schedule";
 import useBookingScreen from "./useBookingScreen";
 import { set } from "date-fns";
 import useTimeSpan from "../utils/useTimeSpan";
-
-interface Employee {
-  id: string;
-  name: string;
-  photoUrl?: string;
-}
+import { BasicInfoDto } from "../../types/common";
 
 export const useBooking = (services: ServiceDto[]) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -18,7 +13,7 @@ export const useBooking = (services: ServiceDto[]) => {
   const [selectServices, setSelectServices] = useState<ServiceDto[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<string>("any");
   const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<BasicInfoDto[]>([]);
   const [schedules, setSchedules] = useState<ScheduleDto[]>([]);
   const { getSchedules, convertPeriodsToTimeSlots } = useBookingScreen();
   const { convertToMinutes } = useTimeSpan();
@@ -34,15 +29,15 @@ export const useBooking = (services: ServiceDto[]) => {
         selectedDate
       );
 
-      const newEmployees: Employee[] = [];
+      const newEmployees: BasicInfoDto[] = [];
       const allSchedules: ScheduleDto[] = [];
 
       response.forEach((item) => {
         if (item.schedules && item.schedules.length > 0) {
           newEmployees.push({
             id: item.schedules[0].employeeId,
-            name: item.employeeName,
-            photoUrl: item.imageUrl,
+            completeName: item.employeeName,
+            imageUrl: item.imageUrl,
           });
 
           allSchedules.push(...item.schedules);

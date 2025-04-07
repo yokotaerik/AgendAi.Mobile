@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import React, { useEffect } from "react";
 import { UserType } from "../types/common";
+import Toast from "react-native-toast-message";
 
 function RootLayoutNav() {
   const { signed, user } = useAuth();
@@ -10,7 +11,7 @@ function RootLayoutNav() {
   useEffect(() => {
     if (signed && user) {
       if (user.role === UserType.Employee) {
-          router.replace("/(ownerTabs)/manage");
+        router.replace("/(ownerTabs)/manage");
       } else {
         router.replace("/(tabs)/home");
       }
@@ -22,6 +23,7 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Slot />
+      <Toast />
     </Stack>
   );
 }
@@ -29,6 +31,7 @@ function RootLayoutNav() {
 function RootLayout() {
   return (
     <AuthProvider>
+      <Toast />
       <RootLayoutNav />
     </AuthProvider>
   );
@@ -37,6 +40,7 @@ function RootLayout() {
 export default function App() {
   return (
     <AuthProvider>
+      <Toast />
       <StatusBar style="auto" />
       <RootLayout />
     </AuthProvider>

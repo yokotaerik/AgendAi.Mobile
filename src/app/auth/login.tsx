@@ -30,11 +30,7 @@ export default function Login() {
       return;
     }
 
-    try {
-      await signIn({ email, password });
-    } catch (error) {
-      Alert.alert(t("login.error"));
-    }
+    await signIn({ email, password });
   };
 
   return (
@@ -43,7 +39,7 @@ export default function Login() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -51,18 +47,22 @@ export default function Login() {
             onPress={() => router.navigate("/home")}
             style={styles.backButton}
           >
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme.colors.text.primary}
+            />
           </TouchableOpacity>
-          
+
           <View style={styles.content}>
             <View style={styles.logoContainer}>
-              <Image 
-                source={require('../../../assets/logo.png')} 
+              <Image
+                source={require("../../../assets/logo.png")}
                 style={styles.logo}
                 resizeMode="contain"
               />
             </View>
-            
+
             <Text style={styles.title}>{t("login.title")}</Text>
             <Text style={styles.subtitle}>{t("login.subtitle")}</Text>
 
@@ -89,10 +89,15 @@ export default function Login() {
               />
 
               <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>{t("login.forgotPassword")}</Text>
+                <Text style={styles.forgotPasswordText}>
+                  {t("login.forgotPassword")}
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handleLogin}
+              >
                 <Text style={styles.loginButtonText}>{t("login.enter")}</Text>
               </TouchableOpacity>
 
@@ -107,14 +112,18 @@ export default function Login() {
                   style={styles.registerButton}
                   onPress={() => router.push("/auth/register-customer")}
                 >
-                  <Text style={styles.registerButtonText}>{t("login.createAccount")}</Text>
+                  <Text style={styles.registerButtonText}>
+                    {t("login.createAccount")}
+                  </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.companyButton}
                   onPress={() => router.push("/company/create")}
                 >
-                  <Text style={styles.companyButtonText}>{t("login.registerCompany")}</Text>
+                  <Text style={styles.companyButtonText}>
+                    {t("login.registerCompany")}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

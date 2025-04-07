@@ -4,6 +4,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
@@ -14,6 +17,8 @@ import { useTranslation } from "react-i18next";
 import useTimeSpan from "../../../hooks/utils/useTimeSpan";
 import { UpdateServiceDto } from "../../../types/service";
 import CustomInput from "../../../components/ui/input/CustomInput";
+import { Ionicons } from "@expo/vector-icons";
+import { theme } from "../../../styles/theme";
 
 export default function AddService() {
   const { t } = useTranslation();
@@ -59,58 +64,136 @@ export default function AddService() {
       }
     } catch (error) {
       console.error(t("addService.error"), error);
+      Alert.alert(t("common.error"), t("addService.errorMessage"));
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{t("addService.title")}</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={theme.colors.text.primary}
+              />
+            </TouchableOpacity>
+            <Text style={styles.title}>{t("addService.title")}</Text>
+            <View style={styles.placeholder} />
+          </View>
 
-      <View style={styles.form}>
-        <CustomInput
-          style={styles.input}
-          placeholder={t("addService.namePlaceholder")}
-          value={service.name || ""}
-          onChange={(text) => setService({ ...service, name: text })}
-        />
+          <View style={styles.formContainer}>
+            <View style={styles.formCard}>
+              <View style={styles.iconContainer}>
+                <Ionicons
+                  name="pricetag"
+                  size={32}
+                  color={theme.colors.primary}
+                />
+              </View>
 
-        <CustomInput
-          style={styles.input}
-          placeholder={t("addService.descriptionPlaceholder")}
-          value={service.description || ""}
-          onChange={(text) => setService({ ...service, description: text })}
-          multiline
-        />
+              <Text style={styles.formTitle}>
+                {t("addService.serviceInfo")}
+              </Text>
 
-        <CustomInput
-          style={styles.input}
-          placeholder={t("addService.pricePlaceholder")}
-          value={price}
-          onChange={(value) => {
-            const parsedValue = parseFloat(value);
-            if (!isNaN(parsedValue) || value === "") {
-              setPrice(value);
-              setService({ ...service, price: parsedValue });
-            }
-          }}
-          keyboardType="numeric"
-        />
+              <View style={styles.inputRow}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>{t("addService.name")}</Text>
+                  <CustomInput
+                    placeholder={t("addService.namePlaceholder")}
+                    value={service.name ?? ""}
+                    onChange={(text: string) =>
+                      setService({ ...service, name: text })
+                    }
+                    containerStyle={styles.customInputContainer}
+                    inputStyle={styles.customInput}
+                  />
+                </View>
+              </View>
 
-        <CustomInput
-          style={styles.input}
-          placeholder={t("addService.durationPlaceholder")}
-          value={duration}
-          onChange={(value) => {
-            if (!isNaN(parseInt(value)) || value === "")
-              handleChangeDuration(value);
-          }}
-          keyboardType="numeric"
-        />
+              <View style={styles.inputRow}>
+                <View style={[styles.inputContainer, { marginBottom: 20 }]}>
+                  <Text style={styles.inputLabel}>
+                    {t("addService.description")}
+                  </Text>
+                  <CustomInput
+                    placeholder={t("addService.descriptionPlaceholder")}
+                    value={service.description ?? ""}
+                    onChange={(text: string) =>
+                      setService({ ...service, description: text })
+                    }
+                    multiline
+                    containerStyle={styles.customInputContainer}
+                    inputStyle={{
+                      ...styles.customInput,
+                      ...styles.multilineInput,
+                    }}
+                  />
+                </View>
+              </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleAddService}>
-          <Text style={styles.buttonText}>{t("addService.addButton")}</Text>
-        </TouchableOpacity>
-      </View>
+              <View style={styles.inputRow}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>{t("addService.price")}</Text>
+                  <CustomInput
+                    placeholder={t("addService.pricePlaceholder")}
+                    value={price}
+                    onChange={(value: string) => {
+                      const parsedValue = parseFloat(value);
+                      if (!isNaN(parsedValue) || value === "") {
+                        setPrice(value);
+                        setService({ ...service, price: parsedValue });
+                      }
+                    }}
+                    keyboardType="numeric"
+                    containerStyle={styles.customInputContainer}
+                    inputStyle={styles.customInput}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputRow}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>
+                    {t("addService.duration")}
+                  </Text>
+                  <CustomInput
+                    placeholder={t("addService.durationPlaceholder")}
+                    value={duration}
+                    onChange={(value: string) => {
+                      if (!isNaN(parseInt(value)) || value === "")
+                        handleChangeDuration(value);
+                    }}
+                    keyboardType="numeric"
+                    containerStyle={styles.customInputContainer}
+                    inputStyle={styles.customInput}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleAddService}
+              >
+                <Text style={styles.submitButtonText}>
+                  {t("addService.addButton")}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -118,35 +201,109 @@ export default function AddService() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderBottomLeftRadius: theme.borderRadius.lg,
+    borderBottomRightRadius: theme.borderRadius.lg,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surface,
     justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  form: {
-    gap: 15,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 5,
     alignItems: "center",
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+  title: {
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+  },
+  placeholder: {
+    width: 40,
+  },
+  formContainer: {
+    padding: theme.spacing.md,
+  },
+  formCard: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.lg,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  iconContainer: {
+    alignSelf: "center",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
+  },
+  formTitle: {
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+    textAlign: "center",
+  },
+  inputRow: {
+    flexDirection: "row",
+    marginBottom: theme.spacing.md,
+  },
+  inputContainer: {
+    flex: 1,
+  },
+  inputLabel: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
+    marginLeft: 4,
+  },
+  customInputContainer: {
+    marginBottom: 0,
+  },
+  customInput: {
+    borderColor: theme.colors.secondary,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+  },
+  multilineInput: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  submitButton: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.sm,
+    paddingVertical: theme.spacing.md,
+    alignItems: "center",
+    marginTop: theme.spacing.md,
+    shadowColor: "rgba(198, 160, 125, 0.4)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitButtonText: {
+    color: theme.colors.background,
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: "600",
   },
 });
