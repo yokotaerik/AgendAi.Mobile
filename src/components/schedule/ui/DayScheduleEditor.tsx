@@ -1,24 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { TimeRangePicker } from './TimeRangePicker';
-import { AvaiblePeriodDto } from '../../../types/schedule';
-import { theme } from '../../../styles/theme';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { useTranslation } from "react-i18next";
+import { TimeRangePicker } from "./TimeRangePicker";
+import { AvaiblePeriodDto } from "../../../types/schedule";
+import { theme } from "../../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 interface DayScheduleEditorProps {
   dayName: string;
   periods: AvaiblePeriodDto[];
   onPeriodsChange: (periods: AvaiblePeriodDto[]) => void;
+  day: string;
 }
 
 export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
   dayName,
   periods,
   onPeriodsChange,
+  day,
 }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [day]);
 
   const handleAddPeriod = () => {
     const newPeriod: AvaiblePeriodDto = {
@@ -48,12 +60,12 @@ export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
         <Text style={styles.dayName}>{dayName}</Text>
         <View style={styles.headerRight}>
           <Text style={styles.periodCount}>
-            {periods.length} {t('period', { count: periods.length })}
+            {periods.length} {t("period", { count: periods.length })}
           </Text>
-          <Ionicons 
-            name={isExpanded ? "chevron-up" : "chevron-down"} 
-            size={20} 
-            color={theme.colors.text.primary} 
+          <Ionicons
+            name={isExpanded ? "chevron-up" : "chevron-down"}
+            size={20}
+            color={theme.colors.text.primary}
           />
         </View>
       </TouchableOpacity>
@@ -72,14 +84,22 @@ export const DayScheduleEditor: React.FC<DayScheduleEditorProps> = ({
                 style={styles.removeButton}
                 onPress={() => handleRemovePeriod(index)}
               >
-                <Ionicons name="trash-outline" size={16} color={theme.colors.error} />
-                <Text style={styles.removeButtonText}>{t('remove')}</Text>
+                <Ionicons
+                  name="trash-outline"
+                  size={16}
+                  color={theme.colors.error}
+                />
+                <Text style={styles.removeButtonText}>{t("remove")}</Text>
               </TouchableOpacity>
             </View>
           ))}
           <TouchableOpacity style={styles.addButton} onPress={handleAddPeriod}>
-            <Ionicons name="add-circle-outline" size={18} color={theme.colors.primary} />
-            <Text style={styles.addButtonText}>{t('addPeriod')}</Text>
+            <Ionicons
+              name="add-circle-outline"
+              size={18}
+              color={theme.colors.primary}
+            />
+            <Text style={styles.addButtonText}>{t("addPeriod")}</Text>
           </TouchableOpacity>
         </ScrollView>
       )}
@@ -92,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.md,
     marginVertical: theme.spacing.sm,
-    overflow: 'hidden',
+    overflow: "hidden",
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -100,19 +120,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: theme.spacing.md,
     backgroundColor: theme.colors.surface,
   },
   headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   dayName: {
     fontSize: theme.typography.fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
     color: theme.colors.text.primary,
   },
   periodCount: {
@@ -128,9 +148,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   removeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: theme.spacing.sm,
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.sm,
@@ -138,22 +158,22 @@ const styles = StyleSheet.create({
   },
   removeButtonText: {
     color: theme.colors.error,
-    textAlign: 'center',
-    fontWeight: '500',
+    textAlign: "center",
+    fontWeight: "500",
     marginLeft: theme.spacing.xs,
   },
   addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: theme.spacing.sm,
     backgroundColor: theme.colors.secondary,
     borderRadius: theme.borderRadius.sm,
   },
   addButtonText: {
     color: theme.colors.primary,
-    textAlign: 'center',
-    fontWeight: '500',
+    textAlign: "center",
+    fontWeight: "500",
     marginLeft: theme.spacing.xs,
   },
 });

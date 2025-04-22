@@ -74,7 +74,7 @@ const ScheduleManagement = () => {
         companyId
       );
     }
-  }, [companyId, startDate, endDate]);
+  }, [companyId, startDate, endDate, employeeId]);
 
   // Fetch customers and services when component mounts
   useEffect(() => {
@@ -179,7 +179,7 @@ const ScheduleManagement = () => {
           ) : (
             <AttendanceListView
               attendances={attendances}
-              isEmployeeView={false}
+              isEmployeeView={true}
             />
           )
         ) : (

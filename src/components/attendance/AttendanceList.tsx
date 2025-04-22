@@ -25,6 +25,10 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
   onEndDateChange,
   isEmployeeView = false,
 }) => {
+
+
+  console.log(isEmployeeView);
+
   return (
     <>
       {employee && <EmployeeHeader employee={employee} />}

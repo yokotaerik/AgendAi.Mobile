@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity, ScrollView } from "react-native";
+import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import { ServiceDto } from "../../types/service";
 import BookingScreen from "../../components/booking/BookingScreen";
 import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { baseURL } from "../../api";
 
 export default function CompanyDetails() {
   const { t } = useTranslation();
@@ -68,11 +69,11 @@ export default function CompanyDetails() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
           <Image
             source={{ 
-              uri: company?.imageUrls?.[0] || 'https://via.placeholder.com/400x200?text=No+Image' 
+              uri: baseURL + company?.imageUrls?.[0] || 'https://via.placeholder.com/400x200?text=No+Image' 
             }}
             style={styles.companyImage}
           />
@@ -136,7 +137,7 @@ export default function CompanyDetails() {
             </TouchableOpacity>
           </View>
           
-          <View style={styles.tabContent}>
+          <View style={styles.tabContentContainer}>
             {activeTab === "services" ? (
               <ServiceTabs
                 onServiceSelect={(services) => {
@@ -149,7 +150,7 @@ export default function CompanyDetails() {
             ) : null}
           </View>
         </View>
-      </ScrollView>
+      </View>
 
       {companyId == null && (
         <TouchableOpacity
@@ -169,8 +170,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  scrollContent: {
-    flexGrow: 1,
+  contentContainer: {
+    flex: 1,
   },
   headerContainer: {
     width: '100%',
@@ -184,6 +185,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     padding: theme.spacing.md,
+    flex: 1,
   },
   companyName: {
     fontSize: theme.typography.fontSize.xl,
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     fontWeight: '600',
   },
-  tabContent: {
+  tabContentContainer: {
     flex: 1,
   },
   errorContainer: {

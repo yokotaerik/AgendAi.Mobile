@@ -1,17 +1,14 @@
 export enum EntitiesAssociation {
   Employee = 0,
-  Service = 1,
-  Company = 2,
+  Company = 1,
 }
 
+// Update your PhotoUploadDto type to include these optional properties
 export interface PhotoUploadDto {
-  // For web
   file?: File;
-  // For React Native
   uri?: string;
+  name?: string;
   type?: string;
-  fileName?: string;
-  // Common properties
   entityId: string;
   entityType: EntitiesAssociation;
 }

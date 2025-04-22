@@ -29,7 +29,7 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
   const { companyId, customerId } = useAuth();
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange(0, 1);
   const { fetchEmployeee, employee } = useGetEmployee();
-
+  
   useEffect(() => {
     if (id != "customer" && id != "company") {
       setIdToGet(id);
@@ -38,6 +38,7 @@ const AttendanceScreen = ({ id }: AttendanceScreenProps) => {
     if (id == "customer" && customerId) {
       setIdToGet(customerId);
     }
+    console.log(customerId);
   }, [id, customerId]);
 
   useEffect(() => {

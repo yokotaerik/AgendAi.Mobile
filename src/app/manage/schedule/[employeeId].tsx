@@ -23,10 +23,12 @@ import api from "../../../api";
 import { theme } from "../../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { usePeriods } from "../../../hooks/periods/usePeriods";
 
 export default function EmployeeScheduleScreen() {
   const { t } = useTranslation();
   const { employeeId } = useLocalSearchParams<{ employeeId: string }>();
+  const { mergeAvailablePeriods } = usePeriods();
   const [showSummary, setShowSummary] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [defaultSchedules, setDefaultSchedules] =
@@ -138,23 +140,22 @@ export default function EmployeeScheduleScreen() {
 
       const otherPeiods = response.data.filter((s) => s.default === false);
       const newSpecificSchedules = otherPeiods.map((schedule) => {
-        
         const date = new Date(schedule.date);
         date.setHours(date.getHours() + 12);
         return {
           date: date.toISOString(),
-          avaiblePeriods: schedule.avaiblePeriods.map((period) => ({
-            start: new Date(period.start),
-            end: new Date(period.end),
-          })),
+          avaiblePeriods: mergeAvailablePeriods(
+            schedule.avaiblePeriods.map((period) => ({
+              start: new Date(period.start),
+              end: new Date(period.end),
+            }))
+          ),
         };
       });
       setSpecificSchedules((prev) => ({
         ...prev,
         schedules: newSpecificSchedules,
       }));
-      console.log(specificSchedules);
-      
     } else {
       alert(t("errorFetchingSchedules"));
     }
@@ -170,11 +171,35 @@ export default function EmployeeScheduleScreen() {
   };
 
   const handleSaveSpecific = async () => {
-    // Implementation for saving specific schedules
-    const response = await api.post("/schedule/specific", specificSchedules);
-    if (response.status === 200) {
-      alert(t("scheduleSaved"));
-    } else {
+    // Create a copy of the data to modify before sending
+    const formattedSchedules = {
+      ...specificSchedules,
+      schedules: specificSchedules.schedules.map((schedule) => {
+        // Format the date as YYYY-MM-DD (DateOnly format)
+        const dateObj = new Date(schedule.date);
+        const formattedDate = dateObj.toISOString().split("T")[0];
+
+        return {
+          date: formattedDate,
+          avaiblePeriods: schedule.avaiblePeriods.map((period) => ({
+            start: period.start.toISOString(),
+            end: period.end.toISOString(),
+          })),
+        };
+      }),
+    };
+
+    console.log("Sending formatted data:", formattedSchedules);
+
+    try {
+      const response = await api.post("/schedule", formattedSchedules);
+      if (response.status === 200) {
+        alert(t("scheduleSaved"));
+      } else {
+        alert(t("errorSavingSchedule"));
+      }
+    } catch (error) {
+      console.log(error);
       alert(t("errorSavingSchedule"));
     }
   };
@@ -200,14 +225,14 @@ export default function EmployeeScheduleScreen() {
 
           <Text style={screenStyles.title}>{t("editSchedule")}</Text>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={screenStyles.summaryButton}
             onPress={() => setShowSummary(!showSummary)}
           >
             <Text style={screenStyles.summaryButtonText}>
               {showSummary ? t("edit") : t("viewSummary")}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View style={screenStyles.content}>
@@ -229,7 +254,7 @@ export default function EmployeeScheduleScreen() {
                     screenStyles.collapsibleHeader,
                     isDefaultScheduleExpanded
                       ? screenStyles.collapisbleHeaderOpen
-                      : { backgroundColor: theme.colors.primary }
+                      : { backgroundColor: theme.colors.primary },
                   ]}
                 >
                   <Text style={screenStyles.collapsibleTitle}>
@@ -257,39 +282,20 @@ export default function EmployeeScheduleScreen() {
 
               <View style={screenStyles.collapsibleSection}>
                 <TouchableOpacity
-                  onPress={() =>
-                    setIsSpecificScheduleExpanded(!isSpecificScheduleExpanded)
-                  }
-                  style={[
-                    screenStyles.collapsibleHeader,
-                    isSpecificScheduleExpanded
-                      ? screenStyles.collapisbleHeaderOpen
-                      : { backgroundColor: theme.colors.primary }
-                  ]}
+                  style={screenStyles.collapsibleHeader}
+                  onPress={() => {
+                    router.push(`/manage/specificSchedule/${employeeId}`);
+                  }}
                 >
                   <Text style={screenStyles.collapsibleTitle}>
                     {t("specificSchedule")}
                   </Text>
                   <Ionicons
-                    name={
-                      isSpecificScheduleExpanded ? "chevron-up" : "chevron-down"
-                    }
+                    name="chevron-forward"
                     size={20}
                     color={theme.colors.text.primary}
                   />
                 </TouchableOpacity>
-
-                {isSpecificScheduleExpanded && (
-                  <View style={screenStyles.editorContainer}>
-                    <SpecificDayScheduleEditor
-                      selectedDate={selectedDate}
-                      specificSchedules={specificSchedules}
-                      onDaySelect={handleDaySelect}
-                      onPeriodsChange={handleSpecificDayPeriodsChange}
-                      onSave={handleSaveSpecific}
-                    />
-                  </View>
-                )}
               </View>
             </>
           )}
@@ -373,7 +379,7 @@ const screenStyles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   collapisbleHeaderOpen: {
-    backgroundColor: theme.colors.background, 
+    backgroundColor: theme.colors.background,
   },
   collapsibleTitle: {
     fontSize: theme.typography.fontSize.md,

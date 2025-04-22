@@ -129,7 +129,7 @@ const CompleteCompanyCard: React.FC<CompleteCompanyCardProps> = ({
       />
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
         <Ionicons name="save-outline" size={20} color={theme.colors.text.primary} />
-        <Text style={styles.buttonText}>{t("editEmployee.saveButton")}</Text>
+        <Text style={styles.buttonText}>{t("saveButton")}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -59,7 +59,7 @@ const ManageServices: React.FC = () => {
           onPress={() => router.push("/manage/service/add")}
         >
           <Ionicons name="add-circle-outline" size={20} color={theme.colors.background} />
-          <Text style={styles.addButtonText}>{t("addService")}</Text>
+          <Text style={styles.addButtonText}>{t("addService.title")}</Text>
         </TouchableOpacity>
 
         {services && services.length > 0 ? (

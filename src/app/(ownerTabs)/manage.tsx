@@ -96,7 +96,7 @@ export default function ManageCompany() {
                 <View style={styles.quickActionIconContainer}>
                   <Ionicons name="add-circle-outline" size={24} color={theme.colors.primary} />
                 </View>
-                <Text style={styles.quickActionText}>{t("addService")}</Text>
+                <Text style={styles.quickActionText}>{t("addService.title")}</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
@@ -106,7 +106,7 @@ export default function ManageCompany() {
                 <View style={styles.quickActionIconContainer}>
                   <Ionicons name="person-add-outline" size={24} color={theme.colors.primary} />
                 </View>
-                <Text style={styles.quickActionText}>{t("addEmployee")}</Text>
+                <Text style={styles.quickActionText}>{t("addEmployee.title")}</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 

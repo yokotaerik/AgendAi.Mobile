@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   BackHandler,
+  Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { ServiceDto } from "../../types/service";
@@ -41,10 +42,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   services,
   backHandler,
   attendance = null,
-  customerId = undefined,
+  customerId: propCustomerId = undefined,
 }) => {
   const { t } = useTranslation();
   const { customerId: contextCustomerId, user } = useAuth();
+  const [effectiveCustomerId, setEffectiveCustomerId] = useState<string | undefined>(propCustomerId);
   const {
     selectedDate,
     selectedTime,
@@ -58,10 +60,10 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   } = useBooking(services);
 
   useEffect(() => {
-    if (customerId == undefined && contextCustomerId != null) {
-      customerId = contextCustomerId;
+    if (propCustomerId === undefined && contextCustomerId !== null) {
+      setEffectiveCustomerId(contextCustomerId);
     }
-  }, []);
+  }, [propCustomerId, contextCustomerId]);
 
   useEffect(() => {
     if (attendance) {
@@ -87,23 +89,35 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   }, [backHandler]);
 
   const handleConfirm = async () => {
-    if (
-      !selectedDate ||
-      !selectedTime ||
-      !selectedEmployee ||
-      selectedEmployee === "any"
-    ) {
-      console.log(
-        "Please select a date, time, and employee before confirming."
-      );
+    // Use the local state variable instead of the prop
+    let customerIdToUse = effectiveCustomerId;
+    
+    if (!selectedDate) {
+      Alert.alert(t("error"), t("selectDateError"));
+      return;
+    }
+    
+    if (!selectedTime) {
+      Alert.alert(t("error"), t("selectTimeError"));
+      return;
+    }
+    
+    if (!selectedEmployee) {
+      Alert.alert(t("error"), t("selectEmployeeError"));
+      return;
+    }
+    
+    if (selectedEmployee === "any") {
+      Alert.alert(t("error"), t("selectEmployeeError"));
       return;
     }
 
-    if(attendance)
-      customerId = attendance.costumer.id;
+    if (attendance != null) {
+      customerIdToUse = attendance.costumer.id;
+    }
 
-    if (!customerId) {
-      console.error("Customer ID is not available.", customerId);
+    if (!customerIdToUse) {
+      console.error("Customer ID is not available.", customerIdToUse);
       return;
     }
 
@@ -122,7 +136,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       bookingData = {
         serviceIds: services.map((service) => service.id),
         employeeId: selectedEmployee,
-        customerId,
+        customerId: customerIdToUse,
         appointment: selectedDateTime.toISOString(),
       };
     } else {
@@ -144,11 +158,12 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       }
 
       if (response.status === 200) {
-        if(user?.role == UserType.Customer)
+        if(user?.role == UserType.Customer){
           router.push("/(tabs)/attendances");
-      } else {
-         backHandler(); 
-      }
+        } else{
+          backHandler();
+        }
+      } 
     } catch {
       return;
     }

@@ -4,10 +4,14 @@ import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import React, { useEffect } from "react";
 import { UserType } from "../types/common";
 import Toast from "react-native-toast-message";
+import { registerForPushNotificationsAsync } from "../utils/notifications";
 
 function RootLayoutNav() {
   const { signed, user } = useAuth();
-
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+  
   useEffect(() => {
     if (signed && user) {
       if (user.role === UserType.Employee) {

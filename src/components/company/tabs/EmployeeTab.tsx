@@ -5,6 +5,7 @@ import { BasicInfoDto } from "../../../types/common";
 import { router } from "expo-router";
 import { theme } from "../../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { baseURL } from "../../../api";
 
 interface EmployeeTabProps {
   employees: BasicInfoDto[];
@@ -23,7 +24,7 @@ const EmployeeTab: React.FC<EmployeeTabProps> = ({ employees }) => {
           <Image
             source={
               item.imageUrl
-                ? { uri: item.imageUrl }
+                ? { uri: baseURL + item.imageUrl }
                 : require("../../../../assets/default-avatar.png")
             }
             style={styles.employeePhoto}

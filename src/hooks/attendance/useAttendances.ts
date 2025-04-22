@@ -37,13 +37,9 @@ export const useAttendances = () => {
   }
 
   const fetchAttendances = async (startDate: string, endDate: string, userType: UserType, id?: string , companyId?: string) => {
-    
-    // FIX DATA
-
     let newDate = new Date(startDate)
     newDate.setDate(newDate.getDate() - 1)
     startDate = newDate.toISOString()
-
     
     try {
       setLoading(true);

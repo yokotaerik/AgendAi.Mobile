@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,9 @@ import api from "../../api";
 import { useAuth } from "../../contexts/AuthContext";
 import { isPasswordValid } from "../../utils/passwordHelper";
 import CustomInput from "../../components/ui/input/CustomInput";
+import { theme } from "../../styles/theme";
+import { Ionicons } from "@expo/vector-icons";
+import AddressForm ,{ AddressFormRef, AddressFormData } from "../../components/address/AddressForm";
 
 export default function CreateCompany() {
   const { t } = useTranslation();
@@ -22,24 +25,28 @@ export default function CreateCompany() {
   const [corporateName, setCorporateName] = useState("");
   const [fantasyName, setFantasyName] = useState("");
 
-  // Endereço
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState("");
-  const [complement, setComplement] = useState("");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
+  // Address as a single object
+  const addressFormRef = useRef<AddressFormRef>(null);
+  const [address, setAddress] = useState<AddressFormData>({
+    street: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "",
+    state: "",
+    zipCode: "",
+  });
 
-  // Proprietário
+  // Owner
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (isPasswordValid(password) === false) {
-      alert(t("invalidPassword"));
+      Alert.alert(t("invalidPassword"));
       return;
     }
 
@@ -50,38 +57,41 @@ export default function CreateCompany() {
     }
 
     if (email.indexOf("@") === -1) {
-      alert(t("invalidEmail"));
+      Alert.alert(t("invalidEmail"));
       return;
     }
-
-    // Verifique if fields is not " ", "   ""
+    // Check if fields are not empty
     if (
       !corporateName.trim() ||
       !fantasyName.trim() ||
-      !street.trim() ||
-      !number.trim() ||
-      !neighborhood.trim() ||
-      !city.trim() ||
-      !state.trim() ||
-      !zipCode.trim() ||
+      !address.street.trim() ||
+      !address.number.trim() ||
+      !address.neighborhood.trim() ||
+      !address.city.trim() ||
+      !address.state.trim() ||
+      !address.zipCode.trim() ||
       !name.trim() ||
       !surname.trim() ||
       !email.trim() ||
       !password.trim()
     ) {
-      alert(t("emptyFields"));
+      Alert.alert(t("emptyFields"));
       return;
     }
 
     try {
-      const address: AddressDto = {
-        street,
-        number,
-        complement,
-        neighborhood,
-        city,
-        state,
-        zipCode,
+      setLoading(true);
+      
+      const addressDto: AddressDto = {
+        street: address.street,
+        number: address.number,
+        complement: address.complement,
+        neighborhood: address.neighborhood,
+        city: address.city,
+        state: address.state,
+        zipCode: address.zipCode,
+        latitude: address.latitude,
+        longitude: address.longitude,
       };
 
       const owner: RegisterEmployeeDto = {
@@ -94,79 +104,131 @@ export default function CreateCompany() {
       const data = {
         corporateName,
         fantasyName,
-        address,
+        address: addressDto,
         owner,
       };
 
-      const response = await api.post("/company", data);
 
-      if (response.status === 200) {
-        signIn({ email, password });
+      if (addressFormRef.current) {
+        const addressWithCoordinates = await addressFormRef.current.getCoordinatesAsync();
+        
+        // Now you can save the address with coordinates
+        console.log('Address with coordinates:', addressWithCoordinates);
+        
+        data.address.latitude = addressWithCoordinates.latitude;
+        data.address.longitude = addressWithCoordinates.longitude;
+
+        const response = await api.post("/company", data);
+  
+        if (response.status === 200) {
+          signIn({ email, password });
+        }
       }
     } catch (error) {
       console.error(error);
-      alert("Erro ao cadastrar empresa");
+      Alert.alert(t("errorRegisteringCompany"));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Cadastro de Empresa</Text>
+      <ScrollView>
+        <View style={styles.header}>
+          <Text style={styles.title}>{t("registerCompany")}</Text>
+        </View>
+        
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="business-outline" size={24} color={theme.colors.primary} />
+              <Text style={styles.sectionTitle}>{t("companyData")}</Text>
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("corporateName")}</Text>
+              <CustomInput
+                placeholder={t("corporateName")}
+                value={corporateName}
+                onChange={setCorporateName}
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("fantasyName")}</Text>
+              <CustomInput
+                placeholder={t("fantasyName")}
+                value={fantasyName}
+                onChange={setFantasyName}
+              />
+            </View>
+          </View>
 
-        <Text style={styles.sectionTitle}>Dados da Empresa</Text>
-        <CustomInput
-          placeholder="Razão Social"
-          value={corporateName}
-          onChange={setCorporateName}
-        />
-        <CustomInput
-          placeholder="Nome Fantasia"
-          value={fantasyName}
-          onChange={setFantasyName}
-        />
+          <View style={styles.card}>
+            <AddressForm 
+              address={address}
+              onChange={setAddress}
+              ref={addressFormRef}
+            />
+          </View>
 
-        <Text style={styles.sectionTitle}>Endereço</Text>
-        <CustomInput placeholder="Rua" value={street} onChange={setStreet} />
-        <CustomInput placeholder="Número" value={number} onChange={setNumber} />
-        <CustomInput
-          placeholder="Complemento"
-          value={complement}
-          onChange={setComplement}
-        />
-        <CustomInput
-          placeholder="Bairro"
-          value={neighborhood}
-          onChange={setNeighborhood}
-        />
-        <CustomInput placeholder="Cidade" value={city} onChange={setCity} />
-        <CustomInput placeholder="Estado" value={state} onChange={setState} />
-        <CustomInput placeholder="CEP" value={zipCode} onChange={setZipCode} />
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="person-outline" size={24} color={theme.colors.primary} />
+              <Text style={styles.sectionTitle}>{t("ownerData")}</Text>
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("name")}</Text>
+              <CustomInput 
+                placeholder={t("name")} 
+                value={name} 
+                onChange={setName} 
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("surname")}</Text>
+              <CustomInput
+                placeholder={t("surname")}
+                value={surname}
+                onChange={setSurname}
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("email")}</Text>
+              <CustomInput
+                placeholder={t("email")}
+                value={email}
+                onChange={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t("password")}</Text>
+              <CustomInput
+                placeholder={t("password")}
+                value={password}
+                onChange={setPassword}
+                secureTextEntry
+              />
+            </View>
+          </View>
 
-        <Text style={styles.sectionTitle}>Dados do Proprietário</Text>
-        <CustomInput placeholder="Nome" value={name} onChange={setName} />
-        <CustomInput
-          placeholder="Sobrenome"
-          value={surname}
-          onChange={setSurname}
-        />
-        <CustomInput
-          placeholder="Email"
-          value={email}
-          onChange={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <CustomInput
-          placeholder="Senha"
-          value={password}
-          onChange={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]} 
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? t("registering") : t("register.title")}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -175,43 +237,68 @@ export default function CreateCompany() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
-  content: {
-    padding: 20,
+  header: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl,
   },
   title: {
-    fontSize: 24,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
+    color: theme.colors.text.primary,
+  },
+  content: {
+    padding: theme.spacing.md,
+  },
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: "bold",
-    marginTop: 15,
-    marginBottom: 10,
+    color: theme.colors.text.primary,
+    marginLeft: theme.spacing.sm,
   },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
+  inputContainer: {
+    marginBottom: theme.spacing.md,
+  },
+  label: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: theme.colors.primary,
     height: 50,
-    borderRadius: 8,
+    borderRadius: theme.borderRadius.md,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "bold",
   },
 });

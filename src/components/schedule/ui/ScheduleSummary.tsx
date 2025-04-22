@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 8,
   },
-}); 
+});

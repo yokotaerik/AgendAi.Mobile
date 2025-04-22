@@ -55,8 +55,15 @@ export interface AttendanceDto {
   id: string;
   dateTime: Date;
   costumer: BasicInfoDto;
+  status: AttendanceStatus;
   employee: BasicInfoDto;
   services: ServiceDto[];
   companyId: string;
 }
 
+export enum AttendanceStatus {
+  Canceled = 2,
+  Confirmed = 3,
+  WaitingCompanyConfirmation = 4,
+  WaitingCustomerConfirmation = 6,
+}

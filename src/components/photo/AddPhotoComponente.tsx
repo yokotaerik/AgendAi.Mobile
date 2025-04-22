@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { PhotoUploadDto, EntitiesAssociation } from "../../types/photo";
+import * as FileSystem from 'expo-file-system';
 
 interface AddPhotoComponentProps {
   entityId: string;
@@ -17,31 +18,69 @@ const AddPhotoComponent: React.FC<AddPhotoComponentProps> = ({
   const [error, setError] = useState<string>("");
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+        base64: false,
+      });
 
-    if (!result.canceled) {
-      const selectedAsset = result.assets[0];
-      // Verificar tamanho do arquivo (5MB = 5 * 1024 * 1024 bytes)
-      const response = await fetch(selectedAsset.uri);
-      const blob = await response.blob();
+      if (!result.canceled) {
+        const selectedAsset = result.assets[0];
+        
+        // Check file size (10MB limit)
+        if (selectedAsset.fileSize && selectedAsset.fileSize > 10 * 1024 * 1024) {
+          setError("A imagem deve ter no máximo 10MB");
+          return;
+        }
+        
+        // For mobile, we need to handle files differently
+        if (Platform.OS !== 'web') {
+          // Get file info
+          const fileInfo = await FileSystem.getInfoAsync(selectedAsset.uri);
+          
+          // Create a FormData object for the file
+          const fileExtension = selectedAsset.uri.split('.').pop() || 'jpg';
+          const fileName = `photo_${Date.now()}.${fileExtension}`;
+          
+          // Instead of trying to create a Blob or File object directly,
+          // we'll just pass the URI and let the API handle the file upload
+          const photoData: PhotoUploadDto = {
+            uri: selectedAsset.uri,
+            name: fileName,
+            type: 'image/jpeg',
+            entityId: entityId,
+            entityType: entityType,
+          };
+          
+          console.log("Photo data:", photoData);
+          
+          onPhotoSelect?.(photoData);
+          setError("");
+        } else {
+          // Web handling (your original code)
+          const response = await fetch(selectedAsset.uri);
+          const blob = await response.blob();
 
-      if (blob.size > 10 * 1024 * 1024) {
-        setError("A imagem deve ter no máximo 5MB");
-        return;
+          if (blob.size > 10 * 1024 * 1024) {
+            setError("A imagem deve ter no máximo 10MB");
+            return;
+          }
+
+          const photoData: PhotoUploadDto = {
+            file: new File([blob], "photo.jpg", { type: "image/jpeg" }),
+            entityId: entityId,
+            entityType: entityType,
+          };
+
+          onPhotoSelect?.(photoData);
+          setError("");
+        }
       }
-
-      const photoData: PhotoUploadDto = {
-        file: new File([blob], "photo.jpg", { type: "image/jpeg" }),
-        entityId: entityId,
-        entityType: entityType,
-      };
-
-      onPhotoSelect?.(photoData);
-      setError("");
+    } catch (err) {
+      console.error("Error picking image:", err);
+      setError("Erro ao selecionar imagem: " + (err instanceof Error ? err.message : String(err)));
     }
   };
 

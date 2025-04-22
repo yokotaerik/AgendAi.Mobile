@@ -14,8 +14,8 @@ import { useTranslation } from "react-i18next";
 import { router } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import EmployeeCard from "../../../components/employee/EmployeeCard";
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../../../styles/theme";
 
@@ -48,11 +48,15 @@ const ManageEmployees: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={theme.colors.text.primary}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>{t("employees")}</Text>
         <View style={styles.placeholder} />
@@ -63,9 +67,13 @@ const ManageEmployees: React.FC = () => {
           style={styles.addButton}
           onPress={() => router.push("/manage/employee/add")}
         >
-          <Ionicons name="person-add-outline" size={20} color={theme.colors.background} />
-          <Text style={styles.addButtonText}>{t("addEmployee")}</Text>
-        </TouchableOpacity>
+          <Ionicons
+            name="person-add-outline"
+            size={20}
+            color={theme.colors.background}
+          />
+          <Text style={styles.addButtonText}>{t("addEmployee.title")}</Text>
+        </TouchableOpacity> 
 
         {employees && employees.length > 0 ? (
           <FlatList
@@ -74,8 +82,8 @@ const ManageEmployees: React.FC = () => {
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             refreshControl={
-              <RefreshControl 
-                refreshing={refreshing} 
+              <RefreshControl
+                refreshing={refreshing}
                 onRefresh={onRefresh}
                 colors={[theme.colors.primary]}
                 tintColor={theme.colors.primary}
@@ -94,14 +102,22 @@ const ManageEmployees: React.FC = () => {
             )}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
-                <Ionicons name="people-outline" size={48} color={theme.colors.tertiary} />
+                <Ionicons
+                  name="people-outline"
+                  size={48}
+                  color={theme.colors.tertiary}
+                />
                 <Text style={styles.emptyText}>{t("noEmployeeFound")}</Text>
               </View>
             )}
           />
         ) : (
           <View style={styles.emptyContainer}>
-            <Ionicons name="people-outline" size={48} color={theme.colors.tertiary} />
+            <Ionicons
+              name="people-outline"
+              size={48}
+              color={theme.colors.tertiary}
+            />
             <Text style={styles.emptyText}>{t("noEmployeeFound")}</Text>
             <Text style={styles.emptySubtext}>{t("addYourFirstEmployee")}</Text>
           </View>

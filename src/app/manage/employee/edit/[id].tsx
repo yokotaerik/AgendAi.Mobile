@@ -45,21 +45,27 @@ const EditEmployee: React.FC = () => {
     }
   };
 
-  const handleAddPhoto = async (photoData: PhotoUploadDto) => {
-    const data = new FormData();
+  const uploadPhoto = async (photoData: PhotoUploadDto) => {
+    const formData = new FormData();
 
-    data.append("entityId", photoData!.entityId);
-    data.append("entityType", photoData.entityType.toString());
+    if (Platform.OS !== "web" && photoData.uri) {
+      formData.append("file", {
+        uri: photoData.uri,
+        name: photoData.name || "photo.jpg",
+        type: photoData.type || "image/jpeg",
+      } as any);
+    } else if (photoData.file) {
+      formData.append("file", photoData.file);
+    }
 
-    data.append("file", photoData.file!);
+    formData.append("entityId", photoData.entityId);
+    formData.append("entityType", photoData.entityType.toString());
 
-    const response = await api.post("/photos/upload", data, {
+    return api.post("/photos/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    console.log(response.status);
   };
 
   const handleEditEmployee = async () => {
@@ -164,7 +170,7 @@ const EditEmployee: React.FC = () => {
                 <AddPhotoComponent
                   entityId={employeeEditData?.id ?? ""}
                   entityType={EntitiesAssociation.Employee}
-                  onPhotoSelect={handleAddPhoto}
+                  onPhotoSelect={uploadPhoto}
                 />
               </View>
 
@@ -288,7 +294,7 @@ const EditEmployee: React.FC = () => {
                   <ActivityIndicator color={theme.colors.background} />
                 ) : (
                   <Text style={styles.submitButtonText}>
-                    {t("editEmployee.saveButton")}
+                    {t("saveButton")}
                   </Text>
                 )}
               </TouchableOpacity>
