@@ -1,7 +1,6 @@
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   View,
   TouchableOpacity,
   Text,
@@ -24,6 +23,7 @@ import CustomInput from "../../../../components/ui/input/CustomInput";
 import AddPhotoComponent from "../../../../components/photo/AddPhotoComponente";
 import { EntitiesAssociation, PhotoUploadDto } from "../../../../types/photo";
 import { theme } from "../../../../styles/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const EditEmployee: React.FC = () => {
   const { t } = useTranslation();

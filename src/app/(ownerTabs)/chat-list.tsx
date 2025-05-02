@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ export default function ChatList() {
   const { user, companyId } = useAuth();
   const [chats, setChats] = useState<ChatDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadChats();
@@ -28,12 +29,35 @@ export default function ChatList() {
     try {
       setLoading(true);
       const response = await api.get('/message/chat');
-      setChats(response.data as ChatDto[]);
+      
+      // Remover duplicatas baseado no receiverId
+      const uniqueChats = removeDuplicateChats(response.data as ChatDto[]);
+      
+      setChats(uniqueChats);
     } catch (error) {
       console.error('Erro ao carregar chats:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+  
+  // Função para remover chats duplicados
+  const removeDuplicateChats = (chatList: ChatDto[]): ChatDto[] => {
+    const uniqueMap = new Map();
+    
+    // Para cada chat, mantém apenas o último com o mesmo receiverId
+    chatList.forEach(chat => {
+      uniqueMap.set(chat.receiverId, chat);
+    });
+    
+    // Converte o Map de volta para array
+    return Array.from(uniqueMap.values());
+  };
+  
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadChats();
   };
 
   const renderChatItem = ({ item }: { item: ChatDto }) => (
@@ -58,7 +82,7 @@ export default function ChatList() {
     </TouchableOpacity>
   );
 
-  if (loading) {  
+  if (loading && !refreshing) {  
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>{t('loading')}</Text>
@@ -77,6 +101,14 @@ export default function ChatList() {
           renderItem={renderChatItem}
           keyExtractor={(item: ChatDto) => item.receiverId}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
         />
       ) : (
         <View style={styles.emptyContainer}>

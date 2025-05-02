@@ -75,19 +75,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     handleServiceSelect(services);
   }, [services]);
 
-  useEffect(() => {
-    const backHandlerSubscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        backHandler();
-        return true; // Indicates that we've handled the back button press
-      }
-    );
-
-    // Clean up the event listener when component unmounts
-    return () => backHandlerSubscription.remove();
-  }, [backHandler]);
-
   const handleConfirm = async () => {
     // Use the local state variable instead of the prop
     let customerIdToUse = effectiveCustomerId;

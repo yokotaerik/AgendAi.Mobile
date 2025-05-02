@@ -43,3 +43,16 @@ export enum UserType
     Employee = 2,   
     Company = 3,
 }
+
+export interface Notifications {
+    
+}
+
+
+export enum TypeNotification {
+    AttendanceConfirmation = 1,
+    AttendanceCanceled = 2,
+    AttendancEdit = 3,
+    AttendanceCreated = 4,
+    AttendancIncoming = 5,
+}

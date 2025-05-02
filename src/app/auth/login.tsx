@@ -17,6 +17,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import CustomInput from "../../components/ui/input/CustomInput";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../../styles/theme";
+import { registerForPushNotificationsAsync } from "../../utils/notifications";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -31,6 +32,7 @@ export default function Login() {
     }
 
     await signIn({ email, password });
+    await registerForPushNotificationsAsync()
   };
 
   return (

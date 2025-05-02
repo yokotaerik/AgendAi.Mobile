@@ -18,18 +18,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import { AttendanceStatus } from "../../types/schedule";
-import api from "../../api";
+import api, { baseURL } from "../../api";
 
 interface AttendanceItemProps {
   attendanceSummary: AttendanceSummary;
   isEmployeeView: boolean;
   onConfirm?: (attendanceId: string) => Promise<void>;
   onCancel?: (attendanceId: string) => Promise<void>;
+  onEdit?: (attendance: AttendanceSummary) => void; // Nova prop para edição
 }
 
 const AttendanceItem: React.FC<AttendanceItemProps> = ({
   attendanceSummary,
   isEmployeeView,
+  onEdit,
 }) => {
   const { t } = useTranslation();
   const { attendance, totalPrice, totalDuration } = attendanceSummary;
@@ -106,8 +108,6 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           text: t("waitingCompanyConfirmation"),
           color: theme.colors.warning,
         };
-      // case "COMPLETED":
-      //   return { text: t("completed"), color: theme.colors.success };
       default:
         return { text: attendance.status, color: theme.colors.text.secondary };
     }
@@ -122,7 +122,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           <Image
             source={
               participant.imageUrl
-                ? { uri: participant.imageUrl }
+                ? { uri: baseURL + participant.imageUrl }
                 : require("../../../assets/default-avatar.png")
             }
             resizeMode="cover"
@@ -196,7 +196,11 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         {attendance.status !== AttendanceStatus.Canceled && (
           <TouchableOpacity
             onPress={() => {
-              router.push("/attendance/edit/" + attendance.id);
+              if (onEdit) {
+                onEdit(attendanceSummary);
+              } else {
+                router.push("/attendance/edit/" + attendance.id);
+              }
             }}
             style={styles.actionButton}
           >

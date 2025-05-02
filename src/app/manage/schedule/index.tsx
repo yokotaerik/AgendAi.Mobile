@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Modal,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ import {
   CustomerDto,
 } from "../../../hooks/customer/customerHooks";
 import EmployeeList from "../../../components/booking/EmployeeList";
+import { AttendanceSummary } from "../../../hooks/attendance/useAttendances";
 
 // Update the component
 const ScheduleManagement = () => {
@@ -45,6 +47,8 @@ const ScheduleManagement = () => {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showBookingScreen, setShowBookingScreen] = useState(false);
+  const [currentAttendance, setCurrentAttendance] =
+    useState<AttendanceSummary | null>(null);
   const { services, fetchServices } = useListServices();
   const { employees, fetchEmployees } = useListEmployees();
   const {
@@ -56,12 +60,24 @@ const ScheduleManagement = () => {
   // Use our custom hook for date range
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
 
-  // Use the attendances hook
   const {
     attendances,
     fetchAttendances,
     loading: attendancesLoading,
   } = useAttendances();
+
+  // Função para recarregar os agendamentos
+  const refreshAttendances = () => {
+    if (companyId) {
+      fetchAttendances(
+        startDate,
+        endDate,
+        UserType.Company,
+        employeeId,
+        companyId
+      );
+    }
+  };
 
   // Fetch attendances when component mounts or date range changes
   useEffect(() => {
@@ -86,7 +102,25 @@ const ScheduleManagement = () => {
   }, [companyId]);
 
   const handleAddAttendance = () => {
+    setCurrentAttendance(null);
+    setSelectedCustomer(null);
+    setSelectedServices([]);
     setShowCustomerModal(true);
+  };
+
+  const handleEditAttendance = (attendance: AttendanceSummary) => {
+    setCurrentAttendance(attendance);
+    // Encontrar o cliente correspondente
+    const customer = customers.find(
+      (c) => c.id === attendance.attendance.costumer.id
+    );
+    if (customer) {
+      setSelectedCustomer(customer);
+      setShowServiceModal(true);
+    } else {
+      // Se não encontrar o cliente, abrir o modal de seleção de cliente
+      setShowCustomerModal(true);
+    }
   };
 
   const handleSelectCustomer = (customer: CustomerDto) => {
@@ -118,6 +152,7 @@ const ScheduleManagement = () => {
     setShowBookingScreen(false);
     setSelectedCustomer(null);
     setSelectedServices([]);
+    setCurrentAttendance(null);
 
     // Refresh attendances after booking
     if (companyId) {
@@ -133,11 +168,13 @@ const ScheduleManagement = () => {
 
   const handleCloseCustomerModal = () => {
     setShowCustomerModal(false);
+    setCurrentAttendance(null);
   };
 
   const handleCloseServiceModal = () => {
     setShowServiceModal(false);
     setSelectedServices([]);
+    setCurrentAttendance(null);
   };
 
   return (
@@ -180,6 +217,9 @@ const ScheduleManagement = () => {
             <AttendanceListView
               attendances={attendances}
               isEmployeeView={true}
+              onEditAttendance={handleEditAttendance}
+              onRefresh={refreshAttendances}
+              refreshing={attendancesLoading}
             />
           )
         ) : (
@@ -224,7 +264,7 @@ const ScheduleManagement = () => {
           <BookingScreen
             services={selectedServices}
             customerId={selectedCustomer.id}
-            attendance={null}
+            attendance={currentAttendance ? currentAttendance.attendance : null}
             backHandler={handleBackFromBooking}
           />
         </Modal>

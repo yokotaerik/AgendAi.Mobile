@@ -64,12 +64,6 @@ export default function EditCompanyScreen() {
   });
 
   useEffect(() => {
-    if (companyId) {
-      fetchCompany(companyId);
-    }
-  }, [companyId]);
-
-  useEffect(() => {
     if (company) {
       // Set company data
       setCorporateName(company.corporateName || "");
@@ -116,14 +110,16 @@ export default function EditCompanyScreen() {
       formData.append("entityId", photoData.entityId);
       formData.append("entityType", photoData.entityType.toString());
 
-      const response = api.post("/photos/upload", formData, {
+      const response = await api.post("/photos/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }) as any;
+      });
+
       if (response.status === 200 || response.status === 201) {
+        // Atualizar os dados da empresa para garantir um refresh completo
         if (companyId) {
-          fetchCompany(companyId);
+          await fetchCompany(companyId);
         }
       }
     } catch (error) {
@@ -134,32 +130,32 @@ export default function EditCompanyScreen() {
     }
   };
 
-    const handleRemoveImage = async (imageUrl: string) => {
-      try {
-        setLoading(true);
+  const handleRemoveImage = async (imageUrl: string) => {
+    try {
+      setLoading(true);
 
-        // Find the photo ID from the URL
-        const photoToRemove = company?.imageUrls?.find(
-          (photo) => photo === imageUrl
-        );
+      // Find the photo ID from the URL
+      const photoToRemove = company?.imageUrls?.find(
+        (photo) => photo === imageUrl
+      );
 
-        let photoId = photoToRemove?.replace("/photos/", "")
+      let photoId = photoToRemove?.replace("/photos/", "");
 
-        if (photoToRemove) {
-          const response = await api.delete(`/photo/${photoId}`);
+      if (photoToRemove) {
+        const response = await api.delete(`/photos/${photoId}`);
 
-          if (response.status === 200 || response.status === 204) {
-            // Update local state
-            setImages(images.filter((img) => img !== imageUrl));
-          }
+        if (response.status === 200 || response.status === 204) {
+          // Update local state
+          setImages(images.filter((img) => img !== imageUrl));
         }
-      } catch (error) {
-        console.error("Error removing photo:", error);
-        Alert.alert(t("errorRemovingPhoto"));
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error removing photo:", error);
+      Alert.alert(t("errorRemovingPhoto"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     // Validate required fields
@@ -218,6 +214,12 @@ export default function EditCompanyScreen() {
     }
   };
 
+  useEffect(() => {
+    if (companyId) {
+      fetchCompany(companyId);
+    }
+  }, [companyId]);
+
   if (fetchLoading) {
     return <LoadingComponent />;
   }
@@ -268,6 +270,19 @@ export default function EditCompanyScreen() {
             ref={addressFormRef}
           />
 
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              (loading || saveLoading) && styles.saveButtonDisabled,
+            ]}
+            onPress={handleSave}
+            disabled={loading || saveLoading}
+          >
+            <Text style={styles.saveButtonText}>
+              {loading || saveLoading ? t("saving") : t("saveChanges")}
+            </Text>
+          </TouchableOpacity>
+
           <View style={styles.imagesSection}>
             <Text style={styles.sectionTitle}>{t("companyImages")}</Text>
 
@@ -288,7 +303,7 @@ export default function EditCompanyScreen() {
                   />
                   <TouchableOpacity
                     style={styles.removeButton}
-                    onPress={() => {}}
+                    onPress={() => handleRemoveImage(image)}
                   >
                     <Ionicons
                       name="close-circle"
@@ -300,19 +315,6 @@ export default function EditCompanyScreen() {
               ))}
             </View>
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.saveButton,
-              (loading || saveLoading) && styles.saveButtonDisabled,
-            ]}
-            onPress={handleSave}
-            disabled={loading || saveLoading}
-          >
-            <Text style={styles.saveButtonText}>
-              {loading || saveLoading ? t("saving") : t("saveChanges")}
-            </Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

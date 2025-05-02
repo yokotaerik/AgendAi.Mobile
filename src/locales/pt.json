@@ -72,6 +72,7 @@
   },
 
   "addService": {
+    "serviceInfo": "Informações do Serviço",
     "title": "Adicionar Serviço",
     "name": "Nome",
     "description": "Descrição",
@@ -136,7 +137,7 @@
     "password": "Senha",
     "confirmPassword": "Confirmar Senha"
   },
-
+  
   "employee": "Funcionário",
   "employees": "Funcionários",
   "sucessSave": "Salvo com sucesso!",
@@ -221,7 +222,7 @@
   "management": "Gerenciamento",
   "manageServices": "Gerenciar Serviços",
   "manageEmployees": "Gerenciar Funcionários",
-  "manageSchedule": "Gerenciar Agenda",
+  "manageSchedule": "Gerenciar agendamentos",
   "manageCompanyProfile": "Gerenciar Perfil da Empresa",
   "noAttendances": "Nenhum agendamento encontrado",
   "selectCustomer": "Selecionar Cliente",
@@ -242,6 +243,8 @@
   "attendanceCancelled": "Agendamento cancelado com sucesso!",
   "cancelAttendanceError": "Erro ao cancelar agendamento",
   "logout.title": "Tem certeza de que deseja sair?",
+  "logout.confirm": "Sim, sair",
+  "logout.confirmMessage": "Você será redirecionado para a página de login.",
   "error": "Erro",
   "selectDateError": "Por favor, selecione uma data antes de confirmar.",
   "selectTimeError": "Por favor, selecione um horário antes de confirmar.",
@@ -257,5 +260,10 @@
   "confirmAttendanceError": "Erro ao confirmar agendamento",
   "cancelAttedanceMessage": "Tem certeza de que deseja cancelar este agendamento?",
   "canceled": "Cancelado",
-  "retry": "Tentar novamente"
+  "retry": "Tentar novamente",
+  "addressNotFound": "Endereço não encontrado",
+  "errorFetchingAddressByZipCode": "Erro ao buscar endereço por CEP",
+  "addressFoundByZipCode": "Endereço encontrado por CEP",
+  "registering": "Cadastrando...",
+  "appoiments": "Agendamentos"
 }

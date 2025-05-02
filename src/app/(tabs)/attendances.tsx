@@ -1,15 +1,16 @@
 import { Redirect } from "expo-router";
 import React from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { StyleSheet } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
 import AttendanceScreen from "../attendance/[id]";
 import { theme } from "../../styles/theme";
+import Login from "../auth/login";
 
 const Attendances = () => {
   const { customerId } = useAuth();
 
   if (!customerId) {
-    return <Redirect href="/auth/login" />;
+    return <Login />;
   } else {
     return <AttendanceScreen id={"customer"} />;
   }

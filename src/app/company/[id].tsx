@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, View, Image, TouchableOpacity, FlatList, Dimensions } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -71,12 +71,47 @@ export default function CompanyDetails() {
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
-          <Image
-            source={{ 
-              uri: baseURL + company?.imageUrls?.[0] || 'https://via.placeholder.com/400x200?text=No+Image' 
-            }}
-            style={styles.companyImage}
-          />
+          {company?.imageUrls && company.imageUrls.length > 0 ? (
+            <FlatList
+              data={company.imageUrls}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: baseURL + item }}
+                  style={styles.companyImage}
+                />
+              )}
+              ListEmptyComponent={
+                <Image
+                  source={{ uri: 'https://via.placeholder.com/400x200?text=No+Image' }}
+                  style={styles.companyImage}
+                />
+              }
+            />
+          ) : (
+            <Image
+              source={{ uri: 'https://via.placeholder.com/400x200?text=No+Image' }}
+              style={styles.companyImage}
+            />
+          )}
+          
+          {/* Indicadores de página */}
+          {company?.imageUrls && company.imageUrls.length > 1 && (
+            <View style={styles.paginationContainer}>
+              {company.imageUrls.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.paginationDot,
+                    { backgroundColor: theme.colors.background }
+                  ]}
+                />
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.infoContainer}>
@@ -177,11 +212,27 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     backgroundColor: theme.colors.surface,
+    position: 'relative',
   },
   companyImage: {
-    width: "100%",
+    width: Dimensions.get('window').width,
     height: 200,
     resizeMode: 'cover',
+  },
+  paginationContainer: {
+    position: 'absolute',
+    bottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+    opacity: 0.7,
   },
   infoContainer: {
     padding: theme.spacing.md,

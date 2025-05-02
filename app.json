@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "AgendAi.Mobile",
-    "slug": "AgendAi.Mobile",
+    "slug": "agendai-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }, 
+      },
       "package": "com.agendai.mobile"
     },
     "web": {
@@ -31,6 +31,15 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2726e174-1b49-4a0e-af93-956ac63d0e7f"
+      }
+    },
+    "owner": "yokotaerik"
   }
 }

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { PhotoUploadDto, EntitiesAssociation } from "../../types/photo";
 import * as FileSystem from 'expo-file-system';
+import { Ionicons } from "@expo/vector-icons";
+import { theme } from "../../styles/theme";
 
 interface AddPhotoComponentProps {
   entityId: string;
@@ -16,9 +18,11 @@ const AddPhotoComponent: React.FC<AddPhotoComponentProps> = ({
   onPhotoSelect,
 }) => {
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const pickImage = async () => {
     try {
+      setLoading(true);
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -32,6 +36,7 @@ const AddPhotoComponent: React.FC<AddPhotoComponentProps> = ({
         // Check file size (10MB limit)
         if (selectedAsset.fileSize && selectedAsset.fileSize > 10 * 1024 * 1024) {
           setError("A imagem deve ter no máximo 10MB");
+          setLoading(false);
           return;
         }
         
@@ -65,6 +70,7 @@ const AddPhotoComponent: React.FC<AddPhotoComponentProps> = ({
 
           if (blob.size > 10 * 1024 * 1024) {
             setError("A imagem deve ter no máximo 10MB");
+            setLoading(false);
             return;
           }
 
@@ -78,40 +84,80 @@ const AddPhotoComponent: React.FC<AddPhotoComponentProps> = ({
           setError("");
         }
       }
+      setLoading(false);
     } catch (err) {
       console.error("Error picking image:", err);
       setError("Erro ao selecionar imagem: " + (err instanceof Error ? err.message : String(err)));
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Text style={styles.buttonText}>Selecionar Foto</Text>
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={pickImage}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <>
+            <Ionicons name="camera-outline" size={20} color="#FFFFFF" style={styles.icon} />
+            <Text style={styles.buttonText}>Selecionar Foto</Text>
+          </>
+        )}
       </TouchableOpacity>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={16} color={theme.colors.error} />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: theme.spacing.md,
+    alignItems: "center",
   },
   button: {
-    backgroundColor: "#007AFF",
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.borderRadius.md,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 200,
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.md,
     fontWeight: "600",
   },
+  icon: {
+    marginRight: theme.spacing.sm,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: theme.spacing.sm,
+    backgroundColor: theme.colors.error || "#FFEBEE",
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
+  },
   errorText: {
-    color: "red",
-    marginTop: 8,
+    color: theme.colors.error,
+    marginLeft: theme.spacing.xs,
+    fontSize: theme.typography.fontSize.sm,
   },
 });
 

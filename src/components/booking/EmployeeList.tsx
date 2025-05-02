@@ -67,7 +67,13 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
     return (
       <TouchableOpacity
         style={[styles.employeeItem, isSelected && styles.selectedEmployeeItem]}
-        onPress={() => onEmployeeSelect(item.id)}
+        onPress={() => {
+          if (isSelected) {
+            onEmployeeSelect("");
+          } else {
+            onEmployeeSelect(item.id);
+          }
+        }}
       >
         <View style={styles.employeeAvatar}>
           <Text style={styles.employeeInitial}>
@@ -87,7 +93,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
   };
 
   return (
-    <View style={[styles.container, !collapsible && {marginTop: 10}]}>
+    <View style={[styles.container, !collapsible && { marginTop: 10 }]}>
       {collapsible && (
         <TouchableOpacity
           style={styles.header}
