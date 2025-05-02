@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Text, StyleSheet, FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import { Text, StyleSheet, FlatList, RefreshControl, TouchableOpacity, View, TextInput } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ export default function Home() {
   const { companies, loading, error, fetchCompanies } = useListCompanies();
   const [refreshing, setRefreshing] = useState(false);
   const { owner } = useAuth();
+  const [search, setSearch] = useState(""); // estado para pesquisa
 
   if(owner) return <Redirect href="/(ownerTabs)/manage" />;
     
@@ -22,6 +23,17 @@ export default function Home() {
     fetchCompanies();
     setRefreshing(false);
   }, [fetchCompanies]);
+
+  const filteredCompanies = companies.filter(company => {
+    const searchLower = search.toLowerCase();
+    return (
+      company.fantasyName?.toLowerCase().includes(searchLower) ||
+      company.corporateName?.toLowerCase().includes(searchLower) ||
+      company.address?.city?.toLowerCase().includes(searchLower) ||
+      company.address?.neighborhood?.toLowerCase().includes(searchLower) ||
+      company.address?.street?.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (loading) {
     return (
@@ -52,9 +64,18 @@ export default function Home() {
       <View style={styles.header}>
         <Text style={styles.title}>{t("companies")}</Text>
       </View>
-      
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={20} color={theme.colors.text.secondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder={t("search")}
+          value={search}
+          onChangeText={setSearch}
+          placeholderTextColor={theme.colors.text.secondary}
+        />
+      </View>
       <FlatList
-        data={companies}
+        data={filteredCompanies}
         keyExtractor={(item) => item.id || ""}
         renderItem={({ item }) => (
           <TouchableOpacity 
@@ -157,5 +178,23 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     textAlign: "center",
     marginTop: theme.spacing.md,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.sm,
+    marginHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: theme.spacing.xs,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text.primary,
   },
 });

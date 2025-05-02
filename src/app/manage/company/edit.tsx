@@ -251,6 +251,7 @@ export default function EditCompanyScreen() {
               placeholder={t("corporateName")}
               value={corporateName}
               onChange={setCorporateName}
+              editable={false}
             />
           </View>
 

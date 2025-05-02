@@ -116,7 +116,7 @@ export default function ManageCompany() {
                 <View style={styles.quickActionIconContainer}>
                   <Ionicons name="calendar-outline" size={24} color={theme.colors.primary} />
                 </View>
-                <Text style={styles.quickActionText}>{t("schedule")}</Text>
+                <Text style={styles.quickActionText}>{t("appoiments")}</Text>
               </TouchableOpacity>
             </View>
           </View>

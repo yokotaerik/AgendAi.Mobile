@@ -265,5 +265,6 @@
   "errorFetchingAddressByZipCode": "Erro ao buscar endereço por CEP",
   "addressFoundByZipCode": "Endereço encontrado por CEP",
   "registering": "Cadastrando...",
-  "appoiments": "Agendamentos"
+  "appoiments": "Agendamentos",
+  "search": "Buscar"
 }
