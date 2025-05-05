@@ -86,7 +86,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
         {company.address && (
           <Text style={styles.address}>
             {company.address.street}, {company.address.number}
-            {company.address.city} - {company.address.state}
+             - {company.address.city} - {company.address.state}
           </Text>
         )}
 

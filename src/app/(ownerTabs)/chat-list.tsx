@@ -97,6 +97,7 @@ export default function ChatList() {
       </View>
       {chats.length > 0 ? (
         <FlatList
+        removeClippedSubviews={false}
           data={chats}
           renderItem={renderChatItem}
           keyExtractor={(item: ChatDto) => item.receiverId}

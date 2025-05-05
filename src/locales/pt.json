@@ -2,7 +2,6 @@
   "chat": {
     "noChats": "Você não possui chats",
     "typingMessage": "está digitando..."
-
   },
   "cancelled": "Cancelado",
   "cancelAttendanceMessage": "Tem certeza de que deseja cancelar este agendamento?",
@@ -68,8 +67,15 @@
     "pricePlaceholder": "Preço",
     "durationPlaceholder": "Duração (minutos)",
     "updateButton": "Atualizar Serviço",
-    "error": "Erro ao atualizar serviço"
+    "error": "Erro ao atualizar serviço",
+    "name": "Nome",
+    "description": "Descrição",
+    "price": "Preço",
+    "duration": "Duração (Minutos)"
   },
+  "addYourFisrtEmployee": "Adicione seu primeiro funcionário",
+  "addYourFirstService": "Adicione seu primeiro serviço",
+  "editService.serviceInfo": "Informações do Serviço",
 
   "addService": {
     "serviceInfo": "Informações do Serviço",
@@ -137,7 +143,7 @@
     "password": "Senha",
     "confirmPassword": "Confirmar Senha"
   },
-  
+
   "employee": "Funcionário",
   "employees": "Funcionários",
   "sucessSave": "Salvo com sucesso!",

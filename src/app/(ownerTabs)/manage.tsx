@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,7 +26,6 @@ export default function ManageCompany() {
   const { services, error: serviceError, fetchServices } = useListServices();
 
   const [refreshing, setRefreshing] = useState(false);
-  const [activeSection, setActiveSection] = useState("services");
 
   useEffect(() => {
     if (companyId != null) {
@@ -52,27 +52,38 @@ export default function ManageCompany() {
     icon: string,
     onPress: () => void,
     count?: number
-  ) => (
-    <TouchableOpacity style={styles.managementCard} onPress={onPress}>
-      <View style={styles.managementIconContainer}>
-        <Ionicons name={icon as any} size={28} color={theme.colors.primary} />
-      </View>
-      <View style={styles.managementTextContainer}>
-        <Text style={styles.managementTitle}>{title}</Text>
-        {count !== undefined && (
-          <Text style={styles.managementCount}>{count} items</Text>
-        )}
-      </View>
-      <Ionicons name="chevron-forward" size={20} color={theme.colors.text.light} />
-    </TouchableOpacity>
-  );
+  ) => {
+    return (
+      <TouchableOpacity style={styles.managementCard} onPress={onPress}>
+        <View style={styles.managementIconContainer}>
+          <Ionicons name={icon as any} size={28} color={theme.colors.primary} />
+        </View>
+        <View style={styles.managementTextContainer}>
+          <Text style={styles.managementTitle}>{title}</Text>
+        </View>
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={theme.colors.text.light}
+        />
+      </TouchableOpacity>
+    );
+  };
+
+  if (!company || !services) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={{ padding: 20 }}>{t("loading")}...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
+          <RefreshControl
+            refreshing={refreshing}
             onRefresh={onRefresh}
             colors={[theme.colors.primary]}
             tintColor={theme.colors.primary}
@@ -89,32 +100,54 @@ export default function ManageCompany() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t("quickActions")}</Text>
             <View style={styles.quickActionsContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
+                key="add-service"
+                testID="add-service-button"
                 style={styles.quickActionButton}
                 onPress={() => router.push("/manage/service/add")}
               >
                 <View style={styles.quickActionIconContainer}>
-                  <Ionicons name="add-circle-outline" size={24} color={theme.colors.primary} />
+                  <Ionicons
+                    name="add-circle-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
                 </View>
-                <Text style={styles.quickActionText}>{t("addService.title")}</Text>
+                <Text style={styles.quickActionText}>
+                  {t("addService.title")}
+                </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
+                key="add-employee"
+                testID="add-employee-button"
                 style={styles.quickActionButton}
                 onPress={() => router.push("/manage/employee/add")}
               >
                 <View style={styles.quickActionIconContainer}>
-                  <Ionicons name="person-add-outline" size={24} color={theme.colors.primary} />
+                  <Ionicons
+                    name="person-add-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
                 </View>
-                <Text style={styles.quickActionText}>{t("addEmployee.title")}</Text>
+                <Text style={styles.quickActionText}>
+                  {t("addEmployee.title")}
+                </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
+                key="view-schedule"
+                testID="view-schedule-button"
                 style={styles.quickActionButton}
                 onPress={() => router.push("/manage/schedule")}
               >
                 <View style={styles.quickActionIconContainer}>
-                  <Ionicons name="calendar-outline" size={24} color={theme.colors.primary} />
+                  <Ionicons
+                    name="calendar-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
                 </View>
                 <Text style={styles.quickActionText}>{t("appoiments")}</Text>
               </TouchableOpacity>
@@ -123,31 +156,49 @@ export default function ManageCompany() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t("management")}</Text>
-            
-            {renderManagementCard(
-              t("manageServices"), 
-              "cut-outline", 
-              () => router.push("/manage/service"),
-              services?.length
-            )}
-            
-            {renderManagementCard(
-              t("manageEmployees"), 
-              "people-outline", 
-              () => router.push("/manage/employee")
-            )}
-            
-            {renderManagementCard(
-              t("manageSchedule"), 
-              "time-outline", 
-              () => router.push("/manage/schedule")
-            )}
-            
-            {renderManagementCard(
-              t("manageCompanyProfile"), 
-              "business-outline", 
-              () => router.push("/manage/company/edit")
-            )}
+
+            <FlatList
+              data={[
+                {
+                  id: "services",
+                  title: t("manageServices"),
+                  icon: "cut-outline",
+                  route: "/manage/service",
+                  testID: "manage-services",
+                },
+                {
+                  id: "employees",
+                  title: t("manageEmployees"),
+                  icon: "people-outline",
+                  route: "/manage/employee",
+                  testID: "manage-employees",
+                },
+                {
+                  id: "schedule",
+                  title: t("manageSchedule"),
+                  icon: "time-outline",
+                  route: "/manage/schedule",
+                  testID: "manage-schedule",
+                },
+                {
+                  id: "profile",
+                  title: t("manageCompanyProfile"),
+                  icon: "business-outline",
+                  route: "/manage/company/edit",
+                  testID: "manage-profile",
+                },
+              ]}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View>
+                  {renderManagementCard(item.title, item.icon, () =>
+                    router.push(item.route)
+                  )}
+                </View>
+              )}
+              removeClippedSubviews={false}
+              scrollEnabled={false}
+            />
           </View>
         </View>
       </ScrollView>

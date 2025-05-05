@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 
 export const baseURL =
   Platform.OS == "android"
-    ? "http://192.168.15.8:5000/api"
+    ? "http://192.168.15.2:5000/api"
     : "http://localhost:5000/api";
 
 const api = axios.create({
@@ -25,12 +25,12 @@ api.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 400:
-          errorMessage = "Erro tratado";
+          errorMessage = "Não foi possível concluir a solicitação. Certifique-se de que todos os dados estão válidos.";
           break;
         default:
           console.log(error.response);
           
-          errorMessage = "An unexpected error occurred.";
+          errorMessage = "Não foi possível concluir a solicitação. Certifique-se de que todos os dados estão válidos.";
           break;
       }
 

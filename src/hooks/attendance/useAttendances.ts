@@ -48,6 +48,7 @@ export const useAttendances = () => {
           [userType === UserType.Customer ? 'customerId' : 'employeeId']: id,
           startDate,
           endDate,
+          companyId
         }
       });
 

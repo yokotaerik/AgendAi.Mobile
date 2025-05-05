@@ -162,11 +162,13 @@ export default function EmployeeScheduleScreen() {
   };
 
   const handleSaveDefault = async () => {
-    const response = await api.post("/schedule/default", defaultSchedules);
-    if (response.status === 200) {
-      alert(t("scheduleSaved"));
-    } else {
-      alert(t("errorSavingSchedule"));
+    try {
+      const response = await api.post("/schedule/default", defaultSchedules);
+      if (response.status === 200) {
+        alert(t("scheduleSaved"));
+      }
+    } catch {
+      
     }
   };
 
@@ -195,8 +197,6 @@ export default function EmployeeScheduleScreen() {
       const response = await api.post("/schedule", formattedSchedules);
       if (response.status === 200) {
         alert(t("scheduleSaved"));
-      } else {
-        alert(t("errorSavingSchedule"));
       }
     } catch (error) {
       console.log(error);

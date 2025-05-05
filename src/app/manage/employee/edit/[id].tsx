@@ -61,11 +61,13 @@ const EditEmployee: React.FC = () => {
     formData.append("entityId", photoData.entityId);
     formData.append("entityType", photoData.entityType.toString());
 
-    return api.post("/photos/upload", formData, {
+    api.post("/photos/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+
+    router.back()
   };
 
   const handleEditEmployee = async () => {

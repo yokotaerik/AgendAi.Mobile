@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FlatList, View, Text, StyleSheet, RefreshControl } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AttendanceSummary } from "../../hooks/attendance/useAttendances";
@@ -8,7 +8,7 @@ import AttendanceItem from "./AttendanceItem";
 interface AttendanceListViewProps {
   attendances: AttendanceSummary[];
   isEmployeeView?: boolean;
-  onEditAttendance?: any
+  onEditAttendance?: any;
   onRefresh?: () => void;
   refreshing?: boolean;
 }
@@ -29,6 +29,14 @@ const AttendanceListView: React.FC<AttendanceListViewProps> = ({
       </View>
     );
   }
+
+  useEffect(() => {
+    attendances.sort(
+      (a, b) =>
+        new Date(a.attendance.dateTime).getTime() -
+        new Date(b.attendance.dateTime).getTime()
+    );
+  }, []);
 
   return (
     <FlatList
