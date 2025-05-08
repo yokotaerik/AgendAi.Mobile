@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 
 export const baseURL =
   Platform.OS == "android"
-    ? "http://192.168.15.2:5000/api"
+    ? "http://192.168.40.172:5000/api"
     : "http://localhost:5000/api";
 
 const api = axios.create({
