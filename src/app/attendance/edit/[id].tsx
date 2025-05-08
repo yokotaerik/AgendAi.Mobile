@@ -55,6 +55,7 @@ export default function EditAttendancePage() {
         backHandler={() => {
           setShowBooking(false);
         }}
+        isBookAgain={false}
       />
     );
 

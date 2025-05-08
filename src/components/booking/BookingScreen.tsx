@@ -28,6 +28,7 @@ interface BookingScreenProps {
   customerId?: string;
   attendance: AttendanceDto | null;
   backHandler: () => void;
+  isBookAgain?: boolean;
 }
 
 interface BookingData {
@@ -43,6 +44,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   backHandler,
   attendance = null,
   customerId: propCustomerId = undefined,
+  isBookAgain = false,
 }) => {
   const { t } = useTranslation();
   const { customerId: contextCustomerId, user } = useAuth();
@@ -65,11 +67,64 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     }
   }, [propCustomerId, contextCustomerId]);
 
+  // Estado para armazenar o horário desejado para seleção automática
+  const [desiredTimeString, setDesiredTimeString] = useState<string | null>(null);
+
   useEffect(() => {
     if (attendance) {
+      // Seleciona o mesmo funcionário
       handleEmployeeSelect(attendance.employee.id);
+      
+      // Obtém o dia da semana do atendimento original
+      const attendanceDate = new Date(attendance.dateTime);
+      const dayOfWeek = attendanceDate.getDay();
+      
+      if (isBookAgain) {
+        // Para "book again", encontra a próxima data com o mesmo dia da semana
+        const today = new Date();
+        // Calcula corretamente os dias a adicionar para chegar ao mesmo dia da semana
+        let daysToAdd = dayOfWeek - today.getDay();
+        if (daysToAdd <= 0) daysToAdd += 7; // Se for negativo ou zero, adiciona uma semana
+        
+        const nextSameWeekday = new Date(today);
+        nextSameWeekday.setDate(today.getDate() + daysToAdd - 1);
+        
+        // Formata a data para YYYY-MM-DD
+        const formattedDate = nextSameWeekday.toISOString().split('T')[0];
+        handleDateSelect(formattedDate);
+      } else {
+        // Para edição, usa a data original do atendimento
+        const formattedDate = attendanceDate.toISOString().split('T')[0];
+        handleDateSelect(formattedDate);
+      }
+      
+      // Armazena o horário desejado para seleção posterior quando os horários estiverem disponíveis
+      const hours = attendanceDate.getHours().toString().padStart(2, '0');
+      const minutes = attendanceDate.getMinutes().toString().padStart(2, '0');
+      const timeString = `${hours}:${minutes}`;
+      setDesiredTimeString(timeString);
     }
   }, [attendance]);
+  
+  // Este useEffect observa quando os horários disponíveis são carregados
+  // e tenta selecionar o horário desejado se ele estiver disponível
+  useEffect(() => {
+    if (desiredTimeString && availableTimes.length > 0) {
+      console.log("Verificando disponibilidade do horário:", desiredTimeString);
+      console.log("Horários disponíveis:", availableTimes.map(t => t.time));
+      
+      const timeExists = availableTimes.some(t => t.time === desiredTimeString);
+      
+      if (timeExists) {
+        console.log("Horário disponível encontrado:", desiredTimeString);
+        handleTimeSelect(desiredTimeString);
+        // Limpa o horário desejado para evitar seleções repetidas
+        setDesiredTimeString(null);
+      } else {
+        console.log("Horário desejado não disponível:", desiredTimeString);
+      }
+    }
+  }, [availableTimes, desiredTimeString, handleTimeSelect]);
 
   useEffect(() => {
     handleServiceSelect(services);
@@ -119,7 +174,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
 
     let bookingData: BookingData;
 
-    if (attendance == undefined) {
+    if (attendance == undefined || isBookAgain) {
+      // Para novo agendamento ou "book again"
       bookingData = {
         serviceIds: services.map((service) => service.id),
         employeeId: selectedEmployee,
@@ -127,6 +183,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
         appointment: selectedDateTime.toISOString(),
       };
     } else {
+      // Para edição de agendamento existente
       bookingData = {
         id: attendance.id,
         serviceIds: services.map((service) => service.id),
@@ -138,9 +195,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     try {
       let response;
 
-      if (attendance == undefined) {
+      if (attendance == undefined || isBookAgain) {
+        // Para novo agendamento ou "book again", cria um novo registro
         response = await api.post("/attendance", bookingData);
       } else {
+        // Para edição, atualiza o registro existente
         response = await api.put("/attendance", bookingData);
       }
 
@@ -166,7 +225,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             color={theme.colors.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{t("makeReservation")}</Text>
+        <Text style={styles.title}>{isBookAgain ? t("bookAgain") : (attendance ? t("editReservation") : t("makeReservation"))}</Text>
         <View style={styles.headerSpacer} />
       </View>
 

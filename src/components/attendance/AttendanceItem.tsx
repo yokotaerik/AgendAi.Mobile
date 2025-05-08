@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import { AttendanceStatus } from "../../types/schedule";
 import api, { baseURL } from "../../api";
+import BookingScreen from "../booking/BookingScreen";
 
 interface AttendanceItemProps {
   attendanceSummary: AttendanceSummary;
@@ -26,12 +27,14 @@ interface AttendanceItemProps {
   onConfirm?: (attendanceId: string) => Promise<void>;
   onCancel?: (attendanceId: string) => Promise<void>;
   onEdit?: (attendance: AttendanceSummary) => void; // Nova prop para edição
+  onBookAgain?: (attendance: AttendanceSummary) => void;
 }
 
 const AttendanceItem: React.FC<AttendanceItemProps> = ({
   attendanceSummary,
   isEmployeeView,
   onEdit,
+  onBookAgain,
 }) => {
   const { t } = useTranslation();
   const { attendance, totalPrice, totalDuration } = attendanceSummary;
@@ -43,10 +46,9 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [bookingModalVisible, setBookingModalVisible] = useState(false);
 
-  console.log(attendance.status);
-  console.log(isEmployeeView);
-  
+
   // Determine if the current user can confirm this attendance
   const canConfirm =
     (attendance.status === AttendanceStatus.WaitingCustomerConfirmation &&
@@ -89,6 +91,19 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         setIsLoading(false);
         setCancelModalVisible(false);
       }
+  };
+  
+  // Handle book again action
+  const handleBookAgain = () => {
+    if (onBookAgain) {
+      onBookAgain(attendanceSummary);
+    } else {
+      setBookingModalVisible(true);
+    }
+  };
+  
+  const handleCloseBookingModal = () => {
+    setBookingModalVisible(false);
   };
 
   // Get status display text and color
@@ -244,6 +259,22 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
             <Text style={styles.actionButtonText}>{t("cancel")}</Text>
           </TouchableOpacity>
         )}
+
+        {/* Book Again button */}
+        {!isEmployeeView && attendance.status === AttendanceStatus.Confirmed && (
+          <TouchableOpacity
+            onPress={handleBookAgain}
+            style={[styles.actionButton, { backgroundColor: `${theme.colors.success}20`, borderColor: theme.colors.success }]}
+            disabled={isLoading}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={20}
+              color={theme.colors.text.primary}
+            />
+            <Text style={styles.actionButtonText}>{t("bookAgain")}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Confirm Modal */}
@@ -308,6 +339,21 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
             </View>
           </View>
         </View>
+      </Modal>
+      
+      {/* Booking Modal */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={bookingModalVisible}
+        onRequestClose={handleCloseBookingModal}
+      >
+        <BookingScreen
+          services={attendance.services}
+          attendance={attendance}
+          backHandler={handleCloseBookingModal}
+          isBookAgain={true}
+        />
       </Modal>
     </TouchableOpacity>
   );

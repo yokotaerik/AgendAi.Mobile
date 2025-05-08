@@ -266,6 +266,7 @@ const ScheduleManagement = () => {
             customerId={selectedCustomer.id}
             attendance={currentAttendance ? currentAttendance.attendance : null}
             backHandler={handleBackFromBooking}
+            isBookAgain={false}
           />
         </Modal>
       )}
