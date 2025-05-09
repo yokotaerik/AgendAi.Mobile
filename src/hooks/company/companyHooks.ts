@@ -45,6 +45,7 @@ export function useListCompanies() {
         setLoading(false);
       })
       .catch((err) => {
+        console.log(err); 
         setError(err as Error);
         setLoading(false);
       });

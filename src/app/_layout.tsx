@@ -6,6 +6,7 @@ import { UserType } from "../types/common";
 import Toast from "react-native-toast-message";
 import { registerForPushNotificationsAsync } from "../utils/notifications";
 import * as Notifications from "expo-notifications";
+import { CurrencyProvider } from "../contexts/CurrencyContext";
 
 // Configurar comportamento das notificações
 Notifications.setNotificationHandler({
@@ -21,9 +22,7 @@ function RootLayoutNav() {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationReceivedListener(
-      (notification: any) => {
-        
-      }
+      (notification: any) => {}
     );
 
     return () => subscription.remove();
@@ -51,10 +50,12 @@ function RootLayoutNav() {
 
 function RootLayout() {
   return (
-    <AuthProvider>
-      <Toast />
-      <RootLayoutNav />
-    </AuthProvider>
+    <CurrencyProvider>
+      <AuthProvider>
+        <Toast />
+        <RootLayoutNav />
+      </AuthProvider>
+    </CurrencyProvider>
   );
 }
 

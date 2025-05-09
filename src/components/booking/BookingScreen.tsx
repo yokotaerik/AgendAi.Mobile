@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  BackHandler,
   Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -22,6 +21,8 @@ import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { use } from "i18next";
 import { UserType } from "../../types/common";
+import { useCurrency } from "../../contexts/CurrencyContext";
+import PriceWithCampaign from "../service/PriceWIthCampaign";
 
 interface BookingScreenProps {
   services: ServiceDto[];
@@ -46,9 +47,12 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   customerId: propCustomerId = undefined,
   isBookAgain = false,
 }) => {
+  const { format } = useCurrency();
   const { t } = useTranslation();
   const { customerId: contextCustomerId, user } = useAuth();
-  const [effectiveCustomerId, setEffectiveCustomerId] = useState<string | undefined>(propCustomerId);
+  const [effectiveCustomerId, setEffectiveCustomerId] = useState<
+    string | undefined
+  >(propCustomerId);
   const {
     selectedDate,
     selectedTime,
@@ -67,54 +71,58 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
     }
   }, [propCustomerId, contextCustomerId]);
 
-  // Estado para armazenar o horário desejado para seleção automática
-  const [desiredTimeString, setDesiredTimeString] = useState<string | null>(null);
+  const [desiredTimeString, setDesiredTimeString] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (attendance) {
       // Seleciona o mesmo funcionário
       handleEmployeeSelect(attendance.employee.id);
-      
+
       // Obtém o dia da semana do atendimento original
       const attendanceDate = new Date(attendance.dateTime);
       const dayOfWeek = attendanceDate.getDay();
-      
+
       if (isBookAgain) {
         // Para "book again", encontra a próxima data com o mesmo dia da semana
         const today = new Date();
         // Calcula corretamente os dias a adicionar para chegar ao mesmo dia da semana
         let daysToAdd = dayOfWeek - today.getDay();
         if (daysToAdd <= 0) daysToAdd += 7; // Se for negativo ou zero, adiciona uma semana
-        
+
         const nextSameWeekday = new Date(today);
         nextSameWeekday.setDate(today.getDate() + daysToAdd - 1);
-        
+
         // Formata a data para YYYY-MM-DD
-        const formattedDate = nextSameWeekday.toISOString().split('T')[0];
+        const formattedDate = nextSameWeekday.toISOString().split("T")[0];
         handleDateSelect(formattedDate);
       } else {
         // Para edição, usa a data original do atendimento
-        const formattedDate = attendanceDate.toISOString().split('T')[0];
+        const formattedDate = attendanceDate.toISOString().split("T")[0];
         handleDateSelect(formattedDate);
       }
-      
+
       // Armazena o horário desejado para seleção posterior quando os horários estiverem disponíveis
-      const hours = attendanceDate.getHours().toString().padStart(2, '0');
-      const minutes = attendanceDate.getMinutes().toString().padStart(2, '0');
+      const hours = attendanceDate.getHours().toString().padStart(2, "0");
+      const minutes = attendanceDate.getMinutes().toString().padStart(2, "0");
       const timeString = `${hours}:${minutes}`;
       setDesiredTimeString(timeString);
     }
   }, [attendance]);
-  
-  // Este useEffect observa quando os horários disponíveis são carregados
-  // e tenta selecionar o horário desejado se ele estiver disponível
+
   useEffect(() => {
     if (desiredTimeString && availableTimes.length > 0) {
       console.log("Verificando disponibilidade do horário:", desiredTimeString);
-      console.log("Horários disponíveis:", availableTimes.map(t => t.time));
-      
-      const timeExists = availableTimes.some(t => t.time === desiredTimeString);
-      
+      console.log(
+        "Horários disponíveis:",
+        availableTimes.map((t) => t.time)
+      );
+
+      const timeExists = availableTimes.some(
+        (t) => t.time === desiredTimeString
+      );
+
       if (timeExists) {
         console.log("Horário disponível encontrado:", desiredTimeString);
         handleTimeSelect(desiredTimeString);
@@ -133,22 +141,22 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
   const handleConfirm = async () => {
     // Use the local state variable instead of the prop
     let customerIdToUse = effectiveCustomerId;
-    
+
     if (!selectedDate) {
       Alert.alert(t("error"), t("selectDateError"));
       return;
     }
-    
+
     if (!selectedTime) {
       Alert.alert(t("error"), t("selectTimeError"));
       return;
     }
-    
+
     if (!selectedEmployee) {
       Alert.alert(t("error"), t("selectEmployeeError"));
       return;
     }
-    
+
     if (selectedEmployee === "any") {
       Alert.alert(t("error"), t("selectEmployeeError"));
       return;
@@ -204,12 +212,12 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
       }
 
       if (response.status === 200) {
-        if(user?.role == UserType.Customer){
+        if (user?.role == UserType.Customer) {
           router.push("/(tabs)/attendances");
-        } else{
+        } else {
           backHandler();
         }
-      } 
+      }
     } catch {
       return;
     }
@@ -225,7 +233,13 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             color={theme.colors.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{isBookAgain ? t("bookAgain") : (attendance ? t("editReservation") : t("makeReservation"))}</Text>
+        <Text style={styles.title}>
+          {isBookAgain
+            ? t("bookAgain")
+            : attendance
+            ? t("editReservation")
+            : t("makeReservation")}
+        </Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -280,10 +294,11 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
             <View key={service.id} style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>{service.name}</Text>
               <Text style={styles.summaryValue}>
-                {service.price.toFixed(2)} {t("currency")}
+                <PriceWithCampaign service={service} style={styles.summaryValue} />
               </Text>
             </View>
           ))}
+
           {selectedTime && (
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>{t("selectedTime")}</Text>

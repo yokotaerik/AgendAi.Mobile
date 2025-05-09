@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Image, Alert, FlatList, ActivityIndicator, Touc
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ServiceCard from "../../components/service/ServiceCard";
 import { useEffect, useState } from "react";
 import api, { baseURL } from "../../api";
 import { EmployeeDto } from "../../types/employee";
@@ -90,7 +89,7 @@ export default function CompanyDetails() {
           <Text style={styles.sectionTitle}>{t("services")}</Text>
         </View>
         
-        <View style={styles.servicesContainer}>
+        {/* <View style={styles.servicesContainer}>
           {employee?.services && employee.services.length > 0 ? (
             <FlatList
               scrollEnabled={true}
@@ -98,7 +97,7 @@ export default function CompanyDetails() {
               data={employee.services}
               keyExtractor={(item) => item.id}
               contentContainerStyle={styles.flatListContent}
-              renderItem={({ item }) => <ServiceCard service={item} />}
+              renderItem={({ item }) => <Service service={item} />}
               showsHorizontalScrollIndicator={false}
               ListEmptyComponent={() => (
                 <View style={styles.emptyContainer}>
@@ -113,7 +112,7 @@ export default function CompanyDetails() {
               <Text style={styles.emptyText}>{t("noServicesFound")}</Text>
             </View>
           )}
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );

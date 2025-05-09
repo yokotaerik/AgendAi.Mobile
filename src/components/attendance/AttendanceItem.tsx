@@ -20,6 +20,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import { AttendanceStatus } from "../../types/schedule";
 import api, { baseURL } from "../../api";
 import BookingScreen from "../booking/BookingScreen";
+import ConfirmationModal from "../common/ConfirmationModal";
+import ReviewModal from "./ReviewModal";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 interface AttendanceItemProps {
   attendanceSummary: AttendanceSummary;
@@ -36,6 +39,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   onEdit,
   onBookAgain,
 }) => {
+  const {format : formatMoney} = useCurrency(); 
   const { t } = useTranslation();
   const { attendance, totalPrice, totalDuration } = attendanceSummary;
   const { user } = useAuth();
@@ -47,16 +51,14 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bookingModalVisible, setBookingModalVisible] = useState(false);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
 
-
-  // Determine if the current user can confirm this attendance
   const canConfirm =
     (attendance.status === AttendanceStatus.WaitingCustomerConfirmation &&
       !isEmployeeView) ||
     (attendance.status === AttendanceStatus.WaitingCompanyConfirmation &&
       isEmployeeView);
 
-  // Handle confirm action
 
   const makeApiCall =  async (attendanceId: string, status: number) => {
       await api.put(`/attendance/status`,{
@@ -78,7 +80,6 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
       }
   };
 
-  // Handle cancel action
   const handleCancel = async () => {
       setIsLoading(true);
       try {
@@ -93,12 +94,26 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
       }
   };
   
-  // Handle book again action
   const handleBookAgain = () => {
     if (onBookAgain) {
       onBookAgain(attendanceSummary);
     } else {
       setBookingModalVisible(true);
+    }
+  };
+
+  const handleReview = () => {
+    setReviewModalVisible(true);
+  }
+  
+  const handleFinished = async () => {
+    setIsLoading(true);
+    try {
+      await makeApiCall(attendance.id, 1); 
+      Alert.alert(t("success"), t("attendanceFinished"));
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -109,6 +124,8 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   // Get status display text and color
   const getStatusInfo = () => {
     switch (attendance.status) {
+      case AttendanceStatus.Finished:
+        return { text: t("finished"), color: theme.colors.success };
       case AttendanceStatus.Confirmed:
         return { text: t("confirmed"), color: theme.colors.success };
       case AttendanceStatus.Canceled:
@@ -146,7 +163,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           />
           <View style={styles.participantInfo}>
             <Text style={styles.participantName}>
-              {participant.completeName}
+              {participant.completeName} 
             </Text>
             <Text style={styles.date}>
               {format(
@@ -181,6 +198,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
       </View>
 
       <View style={styles.servicesContainer}>
+       
         <Text style={styles.servicesTitle}>{t("services")}:</Text>
         {attendance.services.map((service: ServiceDto, index: number) => (
           <View key={index} style={styles.serviceItemContainer}>
@@ -189,7 +207,8 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
               size={16}
               color={theme.colors.primary}
             />
-            <Text style={styles.serviceItem}>{service.name}</Text>
+            <Text style={styles.serviceItem}>{service.name}
+            </Text>
           </View>
         ))}
       </View>
@@ -201,14 +220,16 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.infoLabel}>{t("totalPrice")}:</Text>
-          <Text style={styles.infoValue}>R$ {totalPrice.toFixed(2)}</Text>
+          <Text style={styles.infoValue}>{formatMoney(totalPrice)}</Text>
         </View>
       </View>
 
-      {/* Botões movidos para baixo */}
+      {/* Botões de ação */}
       <View style={styles.actionsContainer}>
         {/* Show Edit button if not cancelled */}
-        {attendance.status !== AttendanceStatus.Canceled && (
+        {attendance.status !== AttendanceStatus.Canceled &&
+        new Date(attendance.dateTime) > new Date() &&
+        (
           <TouchableOpacity
             onPress={() => {
               if (onEdit) {
@@ -245,7 +266,9 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         )}
 
         {/* Show Cancel button if not already cancelled */}
-        {attendance.status !== AttendanceStatus.Canceled && (
+        {attendance.status !== AttendanceStatus.Canceled && 
+        new Date(attendance.dateTime) > new Date() &&
+        (
           <TouchableOpacity
             onPress={() => setCancelModalVisible(true)}
             style={[styles.actionButton, styles.cancelActionButton]}
@@ -261,7 +284,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         )}
 
         {/* Book Again button */}
-        {!isEmployeeView && attendance.status === AttendanceStatus.Confirmed && (
+        {!isEmployeeView && attendance.status === AttendanceStatus.Finished && (
           <TouchableOpacity
             onPress={handleBookAgain}
             style={[styles.actionButton, { backgroundColor: `${theme.colors.success}20`, borderColor: theme.colors.success }]}
@@ -275,73 +298,66 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
             <Text style={styles.actionButtonText}>{t("bookAgain")}</Text>
           </TouchableOpacity>
         )}
+
+        {!isEmployeeView && attendance.status === AttendanceStatus.Finished && (
+          <TouchableOpacity
+            onPress={handleReview}
+            style={[styles.actionButton, { backgroundColor: `${theme.colors.warning}20`, borderColor: theme.colors.warning }]}
+            disabled={isLoading}
+          >
+            <Ionicons
+              name="star-outline"
+              size={20}
+              color={theme.colors.text.primary}
+            />
+            <Text style={styles.actionButtonText}>{t("review")}</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Mark as Finished button */}
+        {isEmployeeView && attendance.status == AttendanceStatus.Confirmed && 
+        new Date(attendance.dateTime) < new Date() &&(
+          <TouchableOpacity
+          onPress={handleFinished}
+          style={[styles.actionButton, { backgroundColor: `${theme.colors.success}20`, borderColor: theme.colors.success }]}
+          disabled={isLoading}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={20}
+              color={theme.colors.text.primary}
+              />
+            <Text style={styles.actionButtonText}>{t("markFinished")}</Text>
+          </TouchableOpacity>
+        )
+        }
       </View>
 
       {/* Confirm Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
+      <ConfirmationModal
         visible={confirmModalVisible}
-        onRequestClose={() => setConfirmModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t("confirmAttendance")}</Text>
-            <Text style={styles.modalText}>
-              {t("confirmAttendanceMessage")}
-            </Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => setConfirmModalVisible(false)}
-                disabled={isLoading}
-              >
-                <Text style={styles.modalButtonText}>{t("no")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalConfirmButton]}
-                onPress={handleConfirm}
-                disabled={isLoading}
-              >
-                <Text style={styles.modalButtonText}>{t("yes")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        title={t("confirmAttendance")}
+        message={t("confirmAttendanceMessage")}
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmModalVisible(false)}
+        isLoading={isLoading}
+        confirmText={t("yes")}
+        cancelText={t("no")}
+      />
 
       {/* Cancel Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
+      <ConfirmationModal
         visible={cancelModalVisible}
-        onRequestClose={() => setCancelModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t("cancelAttendance")}</Text>
-            <Text style={styles.modalText}>{t("cancelAttendanceMessage")}</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => setCancelModalVisible(false)}
-                disabled={isLoading}
-              >
-                <Text style={styles.modalButtonText}>{t("no")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalConfirmButton]}
-                onPress={handleCancel}
-                disabled={isLoading}
-              >
-                <Text style={styles.modalButtonText}>{t("yes")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        title={t("cancelAttendance")}
+        message={t("cancelAttendanceMessage")}
+        onConfirm={handleCancel}
+        onCancel={() => setCancelModalVisible(false)}
+        isLoading={isLoading}
+        confirmText={t("yes")}
+        cancelText={t("no")}
+      />
       
-      {/* Booking Modal */}
+      {/* Booking Modal for booking again */}
       <Modal
         animationType="slide"
         transparent={false}
@@ -355,6 +371,16 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           isBookAgain={true}
         />
       </Modal>
+      
+      {/* Review Modal */}
+      <ReviewModal
+        visible={reviewModalVisible}
+        attendanceId={attendance.id}
+        onClose={() => setReviewModalVisible(false)}
+        onSuccess={() => {
+          // Opcional: atualizar algo após o envio bem-sucedido da avaliação
+        }}
+      />
     </TouchableOpacity>
   );
 };
@@ -474,7 +500,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.text.primary,
   },
-  // Estilos para os botões de ação movidos para baixo
   actionsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -505,64 +530,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.text.primary,
     marginLeft: theme.spacing.xs,
-  },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.lg,
-    alignItems: "center",
-    shadowColor: theme.colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: "bold",
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
-  },
-  modalText: {
-    fontSize: theme.typography.fontSize.md,
-    color: theme.colors.text.secondary,
-    textAlign: "center",
-    marginBottom: theme.spacing.lg,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.sm,
-    alignItems: "center",
-    marginHorizontal: theme.spacing.xs,
-  },
-  modalCancelButton: {
-    backgroundColor: theme.colors.error,
-  },
-  modalConfirmButton: {
-    backgroundColor: theme.colors.success,
-  },
-  modalButtonText: {
-    color: theme.colors.text.primary,
-    fontSize: theme.typography.fontSize.md,
-    fontWeight: "600",
-  },
+  }
 });
 
 export default AttendanceItem;

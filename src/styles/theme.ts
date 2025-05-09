@@ -12,10 +12,12 @@ export const theme = {
       secondary: '#C5C5C5', // Cinza claro
       light: '#9E9E9E'
     },
+    border: '#424242', // Uma borda mais forte para elementos
     transparent: 'transparent',
     success: '#4CAF50',
     error: '#F44336',
     warning: '#FFC107',
+    disabled: '#BDBDBD',
     shadow: 'rgba(0, 0, 0, 0.4)' // Sombra mais forte pra destacar no fundo escuro
   },
   spacing: {

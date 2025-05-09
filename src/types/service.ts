@@ -5,6 +5,11 @@ export interface ServiceDto {
     price: number;
     duration: string; 
     companyId: string;
+    campaign?: CampaignDiscountDto;
+}
+
+export interface CampaignDiscountDto {
+    percentage: number;
 }
 
 export interface CreateServiceDto {

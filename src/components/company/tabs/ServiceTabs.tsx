@@ -12,6 +12,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { router } from "expo-router";
 import { theme } from "../../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useCurrency } from "../../../contexts/CurrencyContext";
+import PriceWithCampaign from "../../service/PriceWIthCampaign";
 
 interface ServiceTabsProps {
   services: ServiceDto[];
@@ -27,6 +29,7 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({
   const { t } = useTranslation();
   const { customerId } = useAuth();
   const [selectedServices, setSelectedServices] = useState<ServiceDto[]>([]);
+  const { format } = useCurrency();
 
   useEffect(() => {
     if (giveSelectedServices) {
@@ -74,7 +77,8 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({
       </View>
       <View style={styles.serviceDetails}>
         <View>
-          <Text style={styles.servicePrice}>{item.price.toFixed(2)}</Text>
+          <Text style={styles.servicePrice}> <PriceWithCampaign service={item} style={styles.servicePrice} />
+        </Text>
           <Text style={styles.serviceDuration}>{item.duration}</Text>
         </View>
         <View>
@@ -84,9 +88,7 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({
               style={styles.selectedButton}
             >
               <Ionicons name="checkmark-circle" size={16} color={theme.colors.text.primary} />
-              <Text style={styles.buttonText}>
-                {t("selected")}
-              </Text>
+     
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -94,9 +96,7 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({
               style={styles.selectButton}
             >
               <Ionicons name="add-circle-outline" size={16} color={theme.colors.text.primary} />
-              <Text style={styles.buttonText}>
-                {t("select")}
-              </Text>
+  
             </TouchableOpacity>
           )}
         </View>

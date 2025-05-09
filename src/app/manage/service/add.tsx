@@ -19,8 +19,10 @@ import { UpdateServiceDto } from "../../../types/service";
 import CustomInput from "../../../components/ui/input/CustomInput";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../../../styles/theme";
+import { useCurrency } from "../../../contexts/CurrencyContext";
 
 export default function AddService() {
+  const { reverseConvert} = useCurrency();
   const { t } = useTranslation();
   const { convertToMinutesInString, convertToTimeSpan } = useTimeSpan();
   const { companyId } = useAuth();
@@ -33,6 +35,8 @@ export default function AddService() {
 
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
+
+  const displayValue = reverseConvert(service.price ?? 0).toString();
 
   const handleChangeDuration = (minutes: string) => {
     setDuration(minutes);
@@ -150,10 +154,13 @@ export default function AddService() {
                     placeholder={t("addService.pricePlaceholder")}
                     value={price}
                     onChange={(value: string) => {
-                      const parsedValue = parseFloat(value);
+                      const parsedValue = parseFloat(value.replace(',', '.'));
+
                       if (!isNaN(parsedValue) || value === "") {
-                        setPrice(value);
-                        setService({ ...service, price: parsedValue });
+                        setPrice(value); // valor como string, convertido para exibição
+
+                        const brlValue = reverseConvert(parsedValue); // converte de moeda local → BRL
+                        setService({ ...service, price: brlValue });
                       }
                     }}
                     keyboardType="numeric"

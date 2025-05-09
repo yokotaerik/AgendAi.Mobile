@@ -17,8 +17,10 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../../../styles/theme";
+import { useCurrency } from "../../../contexts/CurrencyContext";
 
 const ManageServices: React.FC = () => {
+  const { format } = useCurrency();
   const { services, error: serviceError, fetchServices } = useListServices();
   const { t } = useTranslation();
   const { companyId } = useAuth();
@@ -97,7 +99,7 @@ const ManageServices: React.FC = () => {
                       </View>
                       <View style={styles.detailItem}>
                         <Ionicons name="cash-outline" size={14} color={theme.colors.text.light} />
-                        <Text style={styles.detailText}>R$ {item.price.toFixed(2)}</Text>
+                        <Text style={styles.detailText}> {format(item.price)}</Text>
                       </View>
                     </View>
                   </View>

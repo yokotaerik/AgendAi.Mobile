@@ -21,8 +21,10 @@ import useTimeSpan from "../../../../hooks/utils/useTimeSpan";
 import { UpdateServiceDto } from "../../../../types/service";
 import CustomInput from "../../../../components/ui/input/CustomInput";
 import { theme } from "../../../../styles/theme";
+import { useCurrency } from "../../../../contexts/CurrencyContext";
 
 export default function EditService() {
+  const { reverseConvert} = useCurrency();
   const { t } = useTranslation();
   const { convertToMinutesInString, convertToTimeSpan } = useTimeSpan();
   const { id } = useLocalSearchParams();
@@ -209,10 +211,13 @@ export default function EditService() {
                     placeholder={t("editService.pricePlaceholder")}
                     value={price}
                     onChange={(value: string) => {
-                      const parsedValue = parseFloat(value);
+                      const parsedValue = parseFloat(value.replace(',', '.'));
+
                       if (!isNaN(parsedValue) || value === "") {
-                        setPrice(value);
-                        setFormData({ ...formData, price: parsedValue });
+                        setPrice(value); // valor como string, convertido para exibição
+
+                        const brlValue = reverseConvert(parsedValue); // converte de moeda local → BRL
+                        setFormData({ ...service, price: brlValue });
                       }
                     }}
                     keyboardType="numeric"

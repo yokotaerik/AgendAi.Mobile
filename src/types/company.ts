@@ -1,5 +1,6 @@
 import { AddressDto, Cnpj, BasicInfoDto } from './common';
 import { RegisterEmployeeDto } from './employee';
+import { ReviewDto } from './schedule';
 import { ServiceDto } from './service';
 
 export interface CompleteCompanyDto {
@@ -11,6 +12,7 @@ export interface CompleteCompanyDto {
     cnpj?: Cnpj;
     services?: ServiceDto[];
     employees?: BasicInfoDto[];
+    reviews?: ReviewDto[];
 }
 
 export interface CompanyDto {
@@ -20,6 +22,7 @@ export interface CompanyDto {
     fantasyName?: string;
     address?: AddressDto;
     cnpj?: Cnpj;
+    rating: number;
 }
 
 export interface RegisterCompanyDto {

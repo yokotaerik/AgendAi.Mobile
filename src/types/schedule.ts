@@ -59,9 +59,18 @@ export interface AttendanceDto {
   employee: BasicInfoDto;
   services: ServiceDto[];
   companyId: string;
+  review?: ReviewDto;
+}
+
+export interface ReviewDto {
+  username: string
+  date: string;
+  rating: number;
+  comments?: string;
 }
 
 export enum AttendanceStatus {
+  Finished = 1,
   Canceled = 2,
   Confirmed = 3,
   WaitingCompanyConfirmation = 4,

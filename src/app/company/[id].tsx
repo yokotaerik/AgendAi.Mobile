@@ -12,6 +12,7 @@ import BookingScreen from "../../components/booking/BookingScreen";
 import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { baseURL } from "../../api";
+import EvaluationTab from "../../components/company/tabs/EvaluationTab";
 
 export default function CompanyDetails() {
   const { t } = useTranslation();
@@ -170,6 +171,27 @@ export default function CompanyDetails() {
                 {t("employees")}
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.tabButton,
+                activeTab === "reviews" ? styles.activeTabButton : null,
+              ]}
+              onPress={() => setActiveTab("reviews")}
+            >
+              <Ionicons 
+                name="star-outline" 
+                size={18} 
+                color={activeTab === "reviews" ? theme.colors.text.primary : theme.colors.text.secondary} 
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "reviews" ? styles.activeTabText : null,
+                ]}
+              >
+                {t("reviews")}
+              </Text>
+            </TouchableOpacity>
           </View>
           
           <View style={styles.tabContentContainer}>
@@ -182,6 +204,8 @@ export default function CompanyDetails() {
               />
             ) : activeTab === "professionals" ? (
               <EmployeeTab employees={company?.employees || []} />
+            ) : activeTab === "reviews" ?(
+              <EvaluationTab evaluations={company?.reviews || []} />
             ) : null}
           </View>
         </View>
