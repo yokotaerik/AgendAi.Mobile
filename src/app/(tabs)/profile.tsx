@@ -9,6 +9,7 @@ import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import CurrencySelector from "../../components/ui/CurrencySelector";
+import LanguageSelector from "../../components/ui/LanguageSelector";
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -67,8 +68,8 @@ const Profile = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("preferences")}</Text>
-          
           <CurrencySelector />
+          <LanguageSelector />
         </View>
         
         <View style={styles.section}>

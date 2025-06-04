@@ -6,6 +6,7 @@ import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CurrencySelector from "../../components/ui/CurrencySelector";
+import LanguageSelector from "../../components/ui/LanguageSelector";
 
 const Logout = () => {
   const { signOut } = useAuth();
@@ -43,6 +44,7 @@ const Logout = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("preferences")}</Text>
             <CurrencySelector />
+            <LanguageSelector />
         </View>
       </View>
 

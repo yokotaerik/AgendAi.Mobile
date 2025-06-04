@@ -295,87 +295,9 @@ const PerformanceDashboard: React.FC = () => {
               </View>
             </View>
 
-            {/* Status dos agendamentos */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('appointmentStatus')}</Text>
-              <View style={styles.chartContainer}>
-                {/* <PieChart
-                  data={getStatusChartData()}
-                  width={screenWidth - 40}
-                  height={200}
-                  chartConfig={{
-                    backgroundColor: theme.colors.background,
-                    backgroundGradientFrom: theme.colors.background,
-                    backgroundGradientTo: theme.colors.background,
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  }}
-                  accessor="population"
-                  backgroundColor="transparent"
-                  paddingLeft="15"
-                  absolute
-                /> */}
-              </View>
-            </View>
-
             {/* Desempenho por funcionário */}
             {dashboardData.employeePerformances.length > 0 && (
               <>
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>{t('appointmentsByEmployee')}</Text>
-                  <View style={styles.chartContainer}>
-                    {/* <BarChart
-                      yAxisSuffix=""
-                      data={getEmployeeChartData()}
-                      width={screenWidth - 40}
-                      height={220}
-                      yAxisLabel=""
-                      chartConfig={{
-                        backgroundColor: theme.colors.primary,
-                        backgroundGradientFrom: theme.colors.primary,
-                        backgroundGradientTo: theme.colors.primary,
-                        decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                        style: {
-                          borderRadius: 16,
-                        },
-                      }}
-                      style={{
-                        marginVertical: 8,
-                        borderRadius: 16,
-                      }}
-                    /> */}
-                  </View>
-                </View>
-
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>{t('revenueByEmployee')}</Text>
-                  <View style={styles.chartContainer}>
-                    {/* <BarChart
-                      yAxisSuffix=""
-                      data={getRevenueChartData()}
-                      width={screenWidth - 40}
-                      height={220}
-                      yAxisLabel="R$"
-                      chartConfig={{
-                        backgroundColor: theme.colors.success,
-                        backgroundGradientFrom: theme.colors.success,
-                        backgroundGradientTo: theme.colors.success,
-                        decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                        style: {
-                          borderRadius: 16,
-                        },
-                      }}
-                      style={{
-                        marginVertical: 8,
-                        borderRadius: 16,
-                      }}
-                    /> */}
-                  </View>
-                </View>
-
                 {/* Detalhes por funcionário */}
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>{t('employeeDetails')}</Text>
