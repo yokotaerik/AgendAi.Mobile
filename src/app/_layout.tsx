@@ -4,11 +4,9 @@ import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import React, { useEffect, useState } from "react";
 import { UserType } from "../types/common";
 import Toast from "react-native-toast-message";
-import { registerForPushNotificationsAsync } from "../utils/notifications";
 import * as Notifications from "expo-notifications";
 import { CurrencyProvider } from "../contexts/CurrencyContext";
 
-// Configurar comportamento das notificações
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,

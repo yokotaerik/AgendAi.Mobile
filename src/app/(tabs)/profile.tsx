@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import Login from "../auth/login";
 import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import CurrencySelector from "../../components/ui/CurrencySelector";
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -63,6 +65,12 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("preferences")}</Text>
+          
+          <CurrencySelector />
+        </View>
+        
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("account")}</Text>
           
@@ -170,6 +178,7 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontWeight: "500",
   },
+
 });
 
 export default Profile;

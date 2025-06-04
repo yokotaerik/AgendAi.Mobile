@@ -13,7 +13,6 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../contexts/AuthContext";
 import { useListServices } from "../../hooks/service/serviceHooks";
 import { useEffect, useState } from "react";
-import ServiceCard from "../../components/service/ServiceCard";
 import { useGetCompany } from "../../hooks/company/companyHooks";
 import CompleteCompanyCard from "../../components/company/CompleteCompanyCard";
 import { Ionicons } from "@expo/vector-icons";
@@ -187,6 +186,20 @@ export default function ManageCompany() {
                   route: "/manage/company/edit",
                   testID: "manage-profile",
                 },
+                {
+                  id: "campaign",
+                  title: t("manageCampaign"),
+                  icon: "cart-outline",
+                  route: "/manage/campaign",
+                  testID: "manage-campaign-id",
+                },
+                {
+                  id: "dashboard",
+                  title: t("dashboard"),
+                  icon: "analytics-outline",
+                  route: "/manage/dashboard",
+                  testID: "manage-dashboard",
+                }
               ]}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (

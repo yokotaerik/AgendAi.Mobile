@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { ReviewDto } from "../../../types/schedule";
 import { theme } from "../../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface EvaluationTabProps {
   evaluations: ReviewDto[];
@@ -11,12 +13,22 @@ interface EvaluationTabProps {
 
 const EvaluationTab: React.FC<EvaluationTabProps> = ({ evaluations }) => {
   const { t } = useTranslation();
+  
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return format(date, "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR });
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return dateString;
+    }
+  };
 
   const renderEvaluationItem = ({ item }: { item: ReviewDto }) => (
     <View style={styles.evaluationItem}>
       <View style={styles.evaluationHeader}>
         <Text style={styles.userName}>{item.username}</Text>
-        <Text style={styles.date}>{item.date}</Text>
+        <Text style={styles.date}>{formatDate(item.date)}</Text>
       </View>
       <View style={styles.ratingContainer}>
         {[1, 2, 3, 4, 5].map((star) => (

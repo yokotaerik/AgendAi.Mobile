@@ -2,9 +2,7 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 import { router } from "expo-router";
 import api from "../api";
 import { CompanyOwnerDto, LoginDto, UserInfo } from "../types/auth";
-import { EmployeeDto } from "../types/employee";
 import { UserType } from "../types/common";
-import { Alert } from "react-native";
 import { useTranslation } from "react-i18next";
 
 interface AuthContextData {
@@ -37,15 +35,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       var userInfoResponse = await api.get("/auth/me");
-
+      
       if (userInfoResponse.status !== 200) {
         return false;
       }
-
+      
       setSigned(true);
-
+      
       var userData = userInfoResponse.data as UserInfo;
-
+      
       setUser(userData);
 
       if (userData.role === UserType.Employee) {
@@ -53,12 +51,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           `/employee/email/${userData.email}`
         )) as any;
         setCompanyId(employeeInfoResponse?.data?.company?.id as string);
-
+        
         if (employeeInfoResponse.data.owner == true) {
           router.replace("/(ownerTabs)/manage");
         }
       }
-
+      
       if (userData.role === UserType.Customer) {
         var customerResponse = (await api.get(
           "/customer/email/" + userData.email

@@ -39,7 +39,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   onEdit,
   onBookAgain,
 }) => {
-  const {format : formatMoney} = useCurrency(); 
+  const { format: formatMoney } = useCurrency();
   const { t } = useTranslation();
   const { attendance, totalPrice, totalDuration } = attendanceSummary;
   const { user } = useAuth();
@@ -59,41 +59,40 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
     (attendance.status === AttendanceStatus.WaitingCompanyConfirmation &&
       isEmployeeView);
 
-
-  const makeApiCall =  async (attendanceId: string, status: number) => {
-      await api.put(`/attendance/status`,{
-        id: attendanceId,
-        status: status
-      } ) 
-  }
+  const makeApiCall = async (attendanceId: string, status: number) => {
+    await api.put(`/attendance/status`, {
+      id: attendanceId,
+      status: status,
+    });
+  };
 
   const handleConfirm = async () => {
-      try {
-        await makeApiCall(attendance.id, 3);
-        Alert.alert(t("success"), t("attendanceConfirmed"));
-      } catch (error) {
-        console.error("Error confirming attendance:", error);
-        Alert.alert(t("error"), t("errorConfirmingAttendance"));
-      } finally {
-        setIsLoading(false);
-        setConfirmModalVisible(false);
-      }
+    try {
+      await makeApiCall(attendance.id, 3);
+      Alert.alert(t("success"), t("attendanceConfirmed"));
+    } catch (error) {
+      console.error("Error confirming attendance:", error);
+      Alert.alert(t("error"), t("errorConfirmingAttendance"));
+    } finally {
+      setIsLoading(false);
+      setConfirmModalVisible(false);
+    }
   };
 
   const handleCancel = async () => {
-      setIsLoading(true);
-      try {
-        await makeApiCall(attendance.id, 2);
-        Alert.alert(t("success"), t("attendanceCancelled"));
-      } catch (error) {
-        console.error("Error cancelling attendance:", error);
-        Alert.alert(t("error"), t("errorCancellingAttendance"));
-      } finally {
-        setIsLoading(false);
-        setCancelModalVisible(false);
-      }
+    setIsLoading(true);
+    try {
+      await makeApiCall(attendance.id, 2);
+      Alert.alert(t("success"), t("attendanceCancelled"));
+    } catch (error) {
+      console.error("Error cancelling attendance:", error);
+      Alert.alert(t("error"), t("errorCancellingAttendance"));
+    } finally {
+      setIsLoading(false);
+      setCancelModalVisible(false);
+    }
   };
-  
+
   const handleBookAgain = () => {
     if (onBookAgain) {
       onBookAgain(attendanceSummary);
@@ -104,19 +103,19 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
 
   const handleReview = () => {
     setReviewModalVisible(true);
-  }
-  
+  };
+
   const handleFinished = async () => {
     setIsLoading(true);
     try {
-      await makeApiCall(attendance.id, 1); 
+      await makeApiCall(attendance.id, 1);
       Alert.alert(t("success"), t("attendanceFinished"));
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleCloseBookingModal = () => {
     setBookingModalVisible(false);
   };
@@ -163,7 +162,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           />
           <View style={styles.participantInfo}>
             <Text style={styles.participantName}>
-              {participant.completeName} 
+              {participant.completeName}
             </Text>
             <Text style={styles.date}>
               {format(
@@ -177,7 +176,9 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
             {isEmployeeView && attendance.employee && (
               <Text style={styles.employeeInfo}>
                 <Text style={styles.employeeLabel}>{t("professional")}: </Text>
-                <Text style={styles.employeeName}>{attendance.employee.completeName}</Text>
+                <Text style={styles.employeeName}>
+                  {attendance.employee.completeName}
+                </Text>
               </Text>
             )}
           </View>
@@ -198,7 +199,6 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
       </View>
 
       <View style={styles.servicesContainer}>
-       
         <Text style={styles.servicesTitle}>{t("services")}:</Text>
         {attendance.services.map((service: ServiceDto, index: number) => (
           <View key={index} style={styles.serviceItemContainer}>
@@ -207,8 +207,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
               size={16}
               color={theme.colors.primary}
             />
-            <Text style={styles.serviceItem}>{service.name}
-            </Text>
+            <Text style={styles.serviceItem}>{service.name}</Text>
           </View>
         ))}
       </View>
@@ -227,27 +226,26 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
       {/* Botões de ação */}
       <View style={styles.actionsContainer}>
         {/* Show Edit button if not cancelled */}
-        {attendance.status !== AttendanceStatus.Canceled &&
-        new Date(attendance.dateTime) > new Date() &&
-        (
-          <TouchableOpacity
-            onPress={() => {
-              if (onEdit) {
-                onEdit(attendanceSummary);
-              } else {
-                router.push("/attendance/edit/" + attendance.id);
-              }
-            }}
-            style={styles.actionButton}
-          >
-            <Ionicons
-              name="create-outline"
-              size={20}
-              color={theme.colors.text.primary}
-            />
-            <Text style={styles.actionButtonText}>{t("edit")}</Text>
-          </TouchableOpacity>
-        )}
+        {attendance.status !== AttendanceStatus.Canceled && attendance.status !== AttendanceStatus.Finished &&
+          new Date(attendance.dateTime) > new Date() && (
+            <TouchableOpacity
+              onPress={() => {
+                if (onEdit) {
+                  onEdit(attendanceSummary);
+                } else {
+                  router.push("/attendance/edit/" + attendance.id);
+                }
+              }}
+              style={styles.actionButton}
+            >
+              <Ionicons
+                name="create-outline"
+                size={20}
+                color={theme.colors.text.primary}
+              />
+              <Text style={styles.actionButtonText}>{t("edit")}</Text>
+            </TouchableOpacity>
+          )}
 
         {/* Show Confirm button if user can confirm */}
         {canConfirm && (
@@ -266,28 +264,33 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         )}
 
         {/* Show Cancel button if not already cancelled */}
-        {attendance.status !== AttendanceStatus.Canceled && 
-        new Date(attendance.dateTime) > new Date() &&
-        (
-          <TouchableOpacity
-            onPress={() => setCancelModalVisible(true)}
-            style={[styles.actionButton, styles.cancelActionButton]}
-            disabled={isLoading}
-          >
-            <Ionicons
-              name="close-circle-outline"
-              size={20}
-              color={theme.colors.text.primary}
-            />
-            <Text style={styles.actionButtonText}>{t("cancel")}</Text>
-          </TouchableOpacity>
-        )}
+        {attendance.status !== AttendanceStatus.Canceled && attendance.status !== AttendanceStatus.Finished &&
+          new Date(attendance.dateTime) > new Date() && (
+            <TouchableOpacity
+              onPress={() => setCancelModalVisible(true)}
+              style={[styles.actionButton, styles.cancelActionButton]}
+              disabled={isLoading}
+            >
+              <Ionicons
+                name="close-circle-outline"
+                size={20}
+                color={theme.colors.text.primary}
+              />
+              <Text style={styles.actionButtonText}>{t("cancel")}</Text>
+            </TouchableOpacity>
+          )}
 
         {/* Book Again button */}
         {!isEmployeeView && attendance.status === AttendanceStatus.Finished && (
           <TouchableOpacity
             onPress={handleBookAgain}
-            style={[styles.actionButton, { backgroundColor: `${theme.colors.success}20`, borderColor: theme.colors.success }]}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: `${theme.colors.success}20`,
+                borderColor: theme.colors.success,
+              },
+            ]}
             disabled={isLoading}
           >
             <Ionicons
@@ -299,38 +302,53 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           </TouchableOpacity>
         )}
 
-        {!isEmployeeView && attendance.status === AttendanceStatus.Finished && (
-          <TouchableOpacity
-            onPress={handleReview}
-            style={[styles.actionButton, { backgroundColor: `${theme.colors.warning}20`, borderColor: theme.colors.warning }]}
-            disabled={isLoading}
-          >
-            <Ionicons
-              name="star-outline"
-              size={20}
-              color={theme.colors.text.primary}
-            />
-            <Text style={styles.actionButtonText}>{t("review")}</Text>
-          </TouchableOpacity>
-        )}
+        {!isEmployeeView &&
+          attendance.status === AttendanceStatus.Finished &&
+          attendance.review == undefined && (
+            <TouchableOpacity
+              onPress={handleReview}
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: `${theme.colors.warning}20`,
+                  borderColor: theme.colors.warning,
+                },
+              ]}
+              disabled={isLoading}
+            >
+              <Ionicons
+                name="star-outline"
+                size={20}
+                color={theme.colors.text.primary}
+              />
+              <Text style={styles.actionButtonText}>
+                {t("review")}</Text>
+            </TouchableOpacity>
+          )}
 
         {/* Mark as Finished button */}
-        {isEmployeeView && attendance.status == AttendanceStatus.Confirmed && 
-        new Date(attendance.dateTime) < new Date() &&(
-          <TouchableOpacity
-          onPress={handleFinished}
-          style={[styles.actionButton, { backgroundColor: `${theme.colors.success}20`, borderColor: theme.colors.success }]}
-          disabled={isLoading}
-          >
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color={theme.colors.text.primary}
+        {isEmployeeView &&
+          attendance.status == AttendanceStatus.Confirmed &&
+          new Date(attendance.dateTime) < new Date() && (
+            <TouchableOpacity
+              onPress={handleFinished}
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: `${theme.colors.success}20`,
+                  borderColor: theme.colors.success,
+                },
+              ]}
+              disabled={isLoading}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color={theme.colors.text.primary}
               />
-            <Text style={styles.actionButtonText}>{t("markFinished")}</Text>
-          </TouchableOpacity>
-        )
-        }
+              <Text style={styles.actionButtonText}>{t("markFinished")}</Text>
+            </TouchableOpacity>
+          )}
       </View>
 
       {/* Confirm Modal */}
@@ -356,7 +374,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
         confirmText={t("yes")}
         cancelText={t("no")}
       />
-      
+
       {/* Booking Modal for booking again */}
       <Modal
         animationType="slide"
@@ -371,7 +389,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
           isBookAgain={true}
         />
       </Modal>
-      
+
       {/* Review Modal */}
       <ReviewModal
         visible={reviewModalVisible}
@@ -530,7 +548,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.text.primary,
     marginLeft: theme.spacing.xs,
-  }
+  },
 });
 
 export default AttendanceItem;

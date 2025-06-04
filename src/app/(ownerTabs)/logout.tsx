@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { theme } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CurrencySelector from "../../components/ui/CurrencySelector";
 
 const Logout = () => {
   const { signOut } = useAuth();
@@ -35,8 +36,16 @@ const Logout = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t("settings")}</Text>
+
       </View>
-      
+
+      <View style={styles.content}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("preferences")}</Text>
+            <CurrencySelector />
+        </View>
+      </View>
+
       <View style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("account")}</Text>

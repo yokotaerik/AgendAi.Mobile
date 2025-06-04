@@ -1,3 +1,7 @@
+import { Platform } from "react-native";
+import { PhotoUploadDto } from "../types/photo";
+import api from "../api";
+
 // Example of how to modify your API call
 export const uploadPhoto = async (photoData: PhotoUploadDto) => {
   const formData = new FormData();
@@ -15,7 +19,7 @@ export const uploadPhoto = async (photoData: PhotoUploadDto) => {
   }
   
   formData.append('entityId', photoData.entityId);
-  formData.append('entityType', photoData.entityType);
+  formData.append('entityType', String(photoData.entityType));
   
   return api.post('/photos', formData, {
     headers: {

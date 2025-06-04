@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { theme } from "../../styles/theme";
 import { ServiceDto } from "../../types/service";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 interface ServiceSelectionModalProps {
   visible: boolean;
@@ -33,6 +34,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
+  const { format } = useCurrency();
 
   return (
     <Modal
@@ -73,7 +75,7 @@ const ServiceSelectionModal: React.FC<ServiceSelectionModalProps> = ({
                       <View style={styles.serviceInfo}>
                         <Text style={styles.serviceName}>{item.name}</Text>
                         <Text style={styles.serviceDetails}>
-                          {item.price.toFixed(2)} {t("currency")} • {item.duration} min
+                          {format(item.price)} • {item.duration} min
                         </Text>
                       </View>
                       <Ionicons 

@@ -92,7 +92,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({
         if (daysToAdd <= 0) daysToAdd += 7; // Se for negativo ou zero, adiciona uma semana
 
         const nextSameWeekday = new Date(today);
-        nextSameWeekday.setDate(today.getDate() + daysToAdd - 1);
+        nextSameWeekday.setDate(today.getDate() + daysToAdd);
 
         // Formata a data para YYYY-MM-DD
         const formattedDate = nextSameWeekday.toISOString().split("T")[0];

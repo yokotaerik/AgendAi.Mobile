@@ -96,7 +96,6 @@ const ServiceTabs: React.FC<ServiceTabsProps> = ({
               style={styles.selectButton}
             >
               <Ionicons name="add-circle-outline" size={16} color={theme.colors.text.primary} />
-  
             </TouchableOpacity>
           )}
         </View>

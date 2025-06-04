@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type Currency = "BRL" | "USD" | "EUR";
+export type Currency = "BRL" | "USD" | "EUR";
 
 interface CurrencyContextType {
   currency: Currency;
@@ -13,7 +13,7 @@ interface CurrencyContextType {
 const currencyLocales: Record<Currency, string> = {
   BRL: "pt-BR",
   USD: "en-US",
-  EUR: "de-DE", // ou 'pt-PT', 'fr-FR' dependendo do estilo desejado
+  EUR: "de-DE", 
 };
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
@@ -21,7 +21,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 );
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
-  const [currency, setCurrency] = useState<Currency>("USD");
+  const [currency, setCurrency] = useState<Currency>("EUR");
 
   const exchangeRates: Record<Currency, number> = {
     BRL: 1, // moeda base

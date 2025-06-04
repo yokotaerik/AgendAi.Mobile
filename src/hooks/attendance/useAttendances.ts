@@ -9,6 +9,7 @@ export interface AttendanceSummary {
   attendance: AttendanceDto;
   totalPrice: number;
   totalDuration: string;
+  reviewed: boolean;
 }
 
 export const useAttendances = () => {
@@ -64,11 +65,13 @@ export const useAttendances = () => {
         }, 0);
 
         const totalDuration = convertToTimeSpan(totalMinutes);
+        const reviewed = attendance.review !== undefined;
 
         return {
           attendance,
           totalPrice,
-          totalDuration
+          totalDuration,
+          reviewed
         };
       });
 
