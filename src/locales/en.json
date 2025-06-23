@@ -309,5 +309,8 @@
   "selectCurrency": "Select currency",
   "selectLanguage": "Select language",
   "noReviewsFound": "No reviews found",
-  "language": "Language"
+  "language": "Language",
+  "editReservation": "Edit ",
+  "enterDiscountPercentage": "Enter discount percentage"
+
 }

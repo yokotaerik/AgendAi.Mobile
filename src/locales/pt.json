@@ -319,5 +319,7 @@
   "selectCurrency": "Selecionar moeda",
   "selectLanguage": "Selecionar idioma",
   "noReviewsFound": "Nenhuma avaliação encontrada",
-  "language": "Idioma"
+  "language": "Idioma",
+  "editReservation": "Editar reserva",
+  "enterDiscountPercentage": "Digite o percentual de descontos"
 }
